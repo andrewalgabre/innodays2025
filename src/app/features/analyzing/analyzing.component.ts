@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
+import { AnalysisResult } from '../../core/models/scan.model';
 import { AiAnalysisService } from '../../core/services/ai-analysis.service';
 import { ImageTransferService } from '../../core/services/image-transfer.service';
-import { AnalysisResult } from '../../core/models/scan.model';
-import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-analyzing',
@@ -75,8 +75,8 @@ export class AnalyzingComponent implements OnInit {
       this.router.navigate(['/results'], {
         state: {
           analysisResult: this.analysisResult,
-          capturedImage: this.capturedImage
-        }
+          capturedImage: this.capturedImage,
+        },
       });
     }
   }
@@ -88,4 +88,16 @@ export class AnalyzingComponent implements OnInit {
   goHome() {
     this.router.navigate(['/home']);
   }
+
+  getUrgencyLabel(level: number): string {
+    const labels = [
+      'Kein Befund',
+      'Beobachten',
+      'Kontrolle empfohlen',
+      'Tierarzt nötig'
+    ];
+    return labels[level] || 'Unbekannt';
+  }
+
+  Object = Object;
 }

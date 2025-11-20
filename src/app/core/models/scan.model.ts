@@ -19,6 +19,11 @@ export interface AnalysisResult {
   recommendations: string[];
   severity: 'none' | 'mild' | 'moderate' | 'severe';
   requiresVeterinaryAttention: boolean;
+  temperatureZones?: string;
+  diseaseProbabilityScores?: { [key: string]: number };
+  lamenessProbability?: number;
+  urgencyLevel?: number;
+  uncertainties?: string;
 }
 
 // Diagnosis is returned in German from AI, so we accept any string

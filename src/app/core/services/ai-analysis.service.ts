@@ -59,46 +59,120 @@ export class AiAnalysisService {
             role: 'user',
             parts: [
               {
-                text: `Du bist ein deutscher Tierarzt-Experte für Rinderklauen. Analysiere dieses Bild einer Kuhklaue auf DEUTSCH.
+                text: `Du bist ein Experte für Klauengesundheit und Infrarotdiagnostik bei Rindern.
 
-WICHTIG:
-- Antworte IMMER auf DEUTSCH
-- Du MUSST immer eine Diagnose abgeben
-- "confidence" ist ein Wert zwischen 0-100 (z.B. 95 für 95%)
+⚠️ SCHRITT 0: BILDVALIDIERUNG (VERPFLICHTEND)
 
-Mögliche Krankheiten:
-- Dermatitis digitalis (Mortellaro)
-- Klauenrehe (Laminitis)
-- Moderhinke
-- Sohlengeschwür
-- Weiße-Linie-Defekt
-- Ballenfäule
+Prüfe ZUERST, ob das Bild tatsächlich eine Rinderklaue oder ein Rinderbein zeigt:
+- Ist eine Klaue/Huf erkennbar?
+- Zeigt das Bild ein Rinderbein?
+- Ist es ein Thermalbild/FLIR-Aufnahme?
 
-Wenn die Klaue gesund aussieht, verwende "gesund" als diagnosis.
+Falls NICHT → Gib sofort dieses JSON zurück und STOPPE die Analyse:
+{
+  "diagnosis": "Ungültiges Bild",
+  "confidence": 0,
+  "severity": "none",
+  "summary": "Das Bild zeigt keine Rinderklaue. Bitte fotografieren Sie die Klaue des Tieres.",
+  "affected_areas": [],
+  "recommendations": ["Neues Bild von der Klaue aufnehmen"],
+  "requires_veterinary_attention": false,
+  "uncertainties": "Kein Klauenbild erkennbar"
+}
+
+Falls JA → Fahre mit der Analyse fort.
+
+Analysiere das folgende FLIR-Infrarotbild einer Kuhklaue sehr präzise. Verwende unbedingt die typische FLIR-Farbskala zur Interpretation.
+
+🎨 A) FLIR-Farbskala korrekt interpretieren
+
+Nutze folgende Farbbedeutungen:
+- Weiss / Gelb → heisseste Bereiche
+- Orange → sehr warm
+- Rot → warm
+- Magenta / Pink → mild
+- Lila / Violett → kühl
+- Blau / Schwarz → sehr kalt (Hintergrund)
+
+Bewerte relative Temperaturunterschiede, keine absoluten °C.
+
+🦶 B) Anatomie im Bild identifizieren
+
+Analysiere:
+- Zehenspitzen
+- Sohle
+- Ballen
+- Zwischenklauenspalt
+- Kronrand
+- dorsale/plantare Seite
+- Links/Rechts-Asymmetrie
+- Form- oder Strukturabweichungen
+
+Wenn etwas wegen Kamerawinkel/Schmutz/Nässe schwer erkennbar ist → bitte klar erwähnen.
+
+🔥 C) Temperaturmuster erkennen
+
+Finde:
+- Hotspots (weiss/gelb)
+- lokale Hitzeinseln (punktförmig)
+- ringförmige Erwärmung
+- grossflächige Erwärmung
+- asymmetrische Hitze
+- Temperaturverlauf über Zehe → Ballen
+
+🦠 D) Prüfe auf folgende Klauenkrankheiten
+
+Digitale Dermatitis (Mortellaro)
+→ heisser Zwischenklauenspalt, symmetrische Erwärmung
+
+Sohlengeschwür
+→ klar lokalisierter Hotspot an der Sohle
+
+Abszess
+→ kleine, sehr helle punktförmige Hitze
+
+Klauenrehe (Laminitis)
+→ gleichmässig warme Klaue, Zehenbereich stark
+
+Kronrandentzündung
+→ warmes Band am Kronrand
+
+Weitere Krankheiten: Moderhinke, Weisse-Linie-Defekt, Ballenfäule
+
+📊 E) Ausgabeformat (verpflichtend)
 
 Antworte NUR mit JSON (keine Markdown-Codeblöcke, keine Erklärungen):
 
-Beispiel für gesunde Klaue:
 {
-  "diagnosis": "gesund",
-  "confidence": 95,
-  "severity": "none",
-  "summary": "Die Klaue zeigt keine Anzeichen von Krankheiten oder Verletzungen. Die Hornqualität ist gut und die Anatomie ist normal.",
-  "affected_areas": [],
-  "recommendations": ["Regelmäßige Klauenpflege fortsetzen", "Nächste Kontrolle in 3 Monaten"],
-  "requires_veterinary_attention": false
+  "diagnosis": "Name der Krankheit oder 'gesund'",
+  "confidence": 85,
+  "severity": "none/mild/moderate/severe",
+  "temperature_zones": "Beschreibung der Temperaturzonen mit Farbbedeutung",
+  "disease_probability_scores": {
+    "Digitale Dermatitis": 75,
+    "Sohlengeschwür": 10,
+    "Klauenrehe": 5
+  },
+  "lameness_probability": 65,
+  "urgency_level": 2,
+  "summary": "Kurze Zusammenfassung der Analyse",
+  "affected_areas": [{"name": "Bereich", "severity": 3, "temperature": 38}],
+  "recommendations": ["Handlungsempfehlung 1", "Handlungsempfehlung 2"],
+  "uncertainties": "Bildfaktoren die die Bewertung erschweren (Winkel, Schmutz, etc.)",
+  "requires_veterinary_attention": true
 }
 
-Beispiel für kranke Klaue:
-{
-  "diagnosis": "Dermatitis digitalis",
-  "confidence": 85,
-  "severity": "moderate",
-  "summary": "Die Klaue zeigt deutliche Anzeichen von Dermatitis digitalis mit Erosionen im Zwischenklauenspalt. Die Entzündung ist moderat ausgeprägt.",
-  "affected_areas": [{"name": "Zwischenklauenspalt", "severity": 3, "temperature": 38}],
-  "recommendations": ["Sofortige Reinigung und Desinfektion", "Antibiotische Behandlung empfohlen", "Tierarzt kontaktieren"],
-  "requires_veterinary_attention": true
-}`,
+Dringlichkeitslevel:
+0 = kein Befund
+1 = mild – beobachten
+2 = mittleres Risiko – Kontrolle empfohlen
+3 = hoch – Klauenpfleger / Tierarzt nötig
+
+WICHTIG:
+- Antworte IMMER auf DEUTSCH
+- "confidence" und Wahrscheinlichkeiten sind Werte zwischen 0-100
+- Handlungsempfehlungen kurz, klar, landwirtfreundlich
+- Wenn die Klaue gesund aussieht, verwende "gesund" als diagnosis`,
               },
               {
                 inline_data: {
@@ -175,7 +249,7 @@ Beispiel für kranke Klaue:
         }
 
         return {
-          diagnosis: parsedData.diagnosis || 'Unbekannt', // Use diagnosis as-is
+          diagnosis: parsedData.diagnosis || 'Unbekannt',
           confidence: confidence,
           summary: parsedData.summary || '',
           affectedAreas: parsedData.affected_areas || [],
@@ -183,6 +257,11 @@ Beispiel für kranke Klaue:
           severity: this.mapSeverity(parsedData.severity),
           requiresVeterinaryAttention:
             parsedData.requires_veterinary_attention || false,
+          temperatureZones: parsedData.temperature_zones,
+          diseaseProbabilityScores: parsedData.disease_probability_scores,
+          lamenessProbability: parsedData.lameness_probability,
+          urgencyLevel: parsedData.urgency_level,
+          uncertainties: parsedData.uncertainties,
         };
       }
 
@@ -208,7 +287,7 @@ Beispiel für kranke Klaue:
     // German mappings
     if (lower.includes('keine') || lower.includes('gesund')) return 'none';
     if (lower.includes('leicht') || lower.includes('gering')) return 'mild';
-    if (lower.includes('mittel') || lower.includes('mäßig')) return 'moderate';
+    if (lower.includes('mittel') || lower.includes('mässig')) return 'moderate';
     if (lower.includes('schwer') || lower.includes('stark')) return 'severe';
 
     // English mappings (fallback)
@@ -230,7 +309,7 @@ Beispiel für kranke Klaue:
       summary: 'Die Klaue zeigt keine Anzeichen von Krankheiten oder Verletzungen. Die Hornqualität ist gut und die Anatomie ist normal.',
       affectedAreas: [],
       recommendations: [
-        'Regelmäßige Klauenpflege fortsetzen',
+        'Regelmässige Klauenpflege fortsetzen',
         'Auf Veränderungen im Gang oder Verhalten achten',
         'Nächste Kontrolle in 3 Monaten einplanen',
       ],

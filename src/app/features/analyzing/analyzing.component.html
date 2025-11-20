@@ -12,13 +12,16 @@
   <main class="analyzing-main">
     <!-- Captured Image Preview -->
     <div class="image-preview" *ngIf="capturedImage">
-      <img [src]="capturedImage" alt="Aufgenommenes Klauenbild">
+      <img [src]="capturedImage" alt="Aufgenommenes Klauenbild" />
     </div>
 
     <!-- Loading State -->
     <div class="status-card" *ngIf="isAnalyzing">
       <div class="loading-spinner">
-        <lucide-icon name="loader-2" class="loading-icon animate-spin"></lucide-icon>
+        <lucide-icon
+          name="loader-2"
+          class="loading-icon animate-spin"
+        ></lucide-icon>
       </div>
       <h2>Bild wird analysiert</h2>
       <p>KI verarbeitet die Daten...</p>
@@ -38,12 +41,21 @@
     </div>
 
     <!-- Results Preview -->
-    <div class="results-preview" *ngIf="analysisResult && !isAnalyzing && !error">
-      <div class="result-icon success" *ngIf="analysisResult.diagnosis === 'gesund'">
-        <lucide-icon name="check-circle-2"></lucide-icon>
+    <div
+      class="results-preview"
+      *ngIf="analysisResult && !isAnalyzing && !error"
+    >
+      <div
+        class="result-icon success"
+        *ngIf="analysisResult.diagnosis === 'gesund'"
+      >
+        <lucide-icon name="circle-check-big"></lucide-icon>
       </div>
-      <div class="result-icon warning" *ngIf="analysisResult.diagnosis !== 'gesund'">
-        <lucide-icon name="alert-triangle"></lucide-icon>
+      <div
+        class="result-icon warning"
+        *ngIf="analysisResult.diagnosis !== 'gesund'"
+      >
+        <lucide-icon name="triangle-alert"></lucide-icon>
       </div>
 
       <h2>Analyse abgeschlossen</h2>
@@ -56,11 +68,15 @@
       <div class="result-summary">
         <div class="result-item">
           <span class="label">Diagnose</span>
-          <span class="value diagnosis">{{ analysisResult.diagnosis | titlecase }}</span>
+          <span class="value diagnosis">{{
+            analysisResult.diagnosis | titlecase
+          }}</span>
         </div>
         <div class="result-item">
           <span class="label">Konfidenz</span>
-          <span class="value">{{ (analysisResult.confidence * 100).toFixed(0) }}%</span>
+          <span class="value"
+            >{{ (analysisResult.confidence * 100).toFixed(0) }}%</span
+          >
         </div>
         <div class="result-item">
           <span class="label">Schweregrad</span>
@@ -68,13 +84,49 @@
             {{ analysisResult.severity | titlecase }}
           </span>
         </div>
+        <div class="result-item" *ngIf="analysisResult.urgencyLevel !== undefined">
+          <span class="label">Dringlichkeit</span>
+          <span class="value" [class]="'urgency-' + analysisResult.urgencyLevel">
+            {{ getUrgencyLabel(analysisResult.urgencyLevel) }}
+          </span>
+        </div>
+        <div class="result-item" *ngIf="analysisResult.lamenessProbability !== undefined">
+          <span class="label">Lahmheitsrisiko</span>
+          <span class="value">{{ analysisResult.lamenessProbability }}%</span>
+        </div>
       </div>
 
-      <div class="recommendations" *ngIf="analysisResult.recommendations.length > 0">
+      <!-- Temperature Zones -->
+      <div class="info-section" *ngIf="analysisResult.temperatureZones">
+        <h3>Temperaturzonen</h3>
+        <p class="info-text">{{ analysisResult.temperatureZones }}</p>
+      </div>
+
+      <!-- Disease Probability Scores -->
+      <div class="info-section" *ngIf="analysisResult.diseaseProbabilityScores && Object.keys(analysisResult.diseaseProbabilityScores).length > 0">
+        <h3>Wahrscheinlichkeiten</h3>
+        <div class="probability-list">
+          <div class="probability-item" *ngFor="let disease of Object.keys(analysisResult.diseaseProbabilityScores)">
+            <span class="disease-name">{{ disease }}</span>
+            <span class="probability-value">{{ analysisResult.diseaseProbabilityScores[disease] }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="recommendations"
+        *ngIf="analysisResult.recommendations.length > 0"
+      >
         <h3>Empfehlungen</h3>
         <ul>
           <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
         </ul>
+      </div>
+
+      <!-- Uncertainties -->
+      <div class="info-section uncertainties" *ngIf="analysisResult.uncertainties">
+        <h3>Einschränkungen</h3>
+        <p class="info-text">{{ analysisResult.uncertainties }}</p>
       </div>
 
       <div class="alert-box" *ngIf="analysisResult.requiresVeterinaryAttention">

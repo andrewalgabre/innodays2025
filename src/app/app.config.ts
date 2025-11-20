@@ -8,7 +8,7 @@ import { LUCIDE_ICONS, LucideIconProvider } from 'lucide-angular';
 import {
   Settings, Camera, CheckCircle2, Users, Inbox, Home, History, BarChart3,
   ArrowLeft, Loader2, AlertCircle, RotateCw, Info, X, AlertTriangle,
-  ArrowRight, MapPin, Lightbulb, Image
+  ArrowRight, MapPin, Lightbulb, Image, TriangleAlert, CircleCheckBig
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -35,7 +35,7 @@ export const appConfig: ApplicationConfig = {
       useValue: new LucideIconProvider({
         Settings, Camera, CheckCircle2, Users, Inbox, Home, History, BarChart3,
         ArrowLeft, Loader2, AlertCircle, RotateCw, Info, X, AlertTriangle,
-        ArrowRight, MapPin, Lightbulb, Image
+        ArrowRight, MapPin, Lightbulb, Image, TriangleAlert, CircleCheckBig
       })
     }
   ]
