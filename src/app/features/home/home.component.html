@@ -1,0 +1,85 @@
+<div class="home-container">
+  <!-- App Header -->
+  <header class="app-header">
+    <h1 class="app-title">{{ appName }}</h1>
+    <button class="btn-icon-header">
+      <i class="pi pi-cog"></i>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Quick Action Card -->
+    <div class="quick-action-card">
+      <div class="action-content">
+        <div class="action-icon">
+          <i class="pi pi-camera"></i>
+        </div>
+        <div class="action-text">
+          <h2>New Scan</h2>
+          <p>Scan cow hoof for disease detection</p>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-scan" (click)="startNewScan()">
+        <i class="pi pi-camera"></i>
+        Start Scan
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-section">
+      <h3 class="section-label">Overview</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Total Scans</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Cows Tracked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-section">
+      <h3 class="section-label">Recent Scans</h3>
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <p>No scans yet</p>
+        <span>Start your first scan to begin monitoring</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active">
+      <i class="pi pi-home"></i>
+      <span>Home</span>
+    </button>
+    <button class="nav-item">
+      <i class="pi pi-history"></i>
+      <span>History</span>
+    </button>
+    <button class="nav-item">
+      <i class="pi pi-chart-bar"></i>
+      <span>Stats</span>
+    </button>
+    <button class="nav-item">
+      <i class="pi pi-cog"></i>
+      <span>Settings</span>
+    </button>
+  </nav>
+</div>
