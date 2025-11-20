@@ -4,7 +4,7 @@
     <button class="btn-icon btn-secondary" (click)="goBack()">
       <i class="pi pi-arrow-left"></i>
     </button>
-    <h1 class="camera-title">Hoof Scan</h1>
+    <h1 class="camera-title">Klauen-Scan</h1>
     <div class="spacer"></div>
   </header>
 
@@ -13,17 +13,17 @@
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-state">
       <i class="pi pi-spin pi-spinner loading-icon"></i>
-      <p>Starting camera...</p>
+      <p>Kamera wird gestartet...</p>
     </div>
 
     <!-- Error State -->
     <div *ngIf="error && !isLoading" class="error-state">
       <i class="pi pi-exclamation-circle error-icon"></i>
-      <h3>Camera Error</h3>
+      <h3>Kamera-Fehler</h3>
       <p>{{ error }}</p>
       <button class="btn btn-primary" (click)="startCamera()">
         <i class="pi pi-refresh"></i>
-        Retry
+        Erneut versuchen
       </button>
     </div>
 
@@ -41,8 +41,8 @@
     <div *ngIf="isCameraActive && !isLoading" class="guide-overlay">
       <div class="guide-frame"></div>
       <div class="guide-text">
-        <p>Position the cow's hoof within the frame</p>
-        <p class="text-muted">Ensure good lighting and clear view</p>
+        <p>Positionieren Sie die Kuhklaue im Rahmen</p>
+        <p class="text-muted">Sorgen Sie für gute Beleuchtung und klare Sicht</p>
       </div>
     </div>
   </div>
@@ -78,7 +78,7 @@
     <div class="controls-bottom">
       <div class="info-card">
         <i class="pi pi-info-circle"></i>
-        <span>Tap to capture thermal image</span>
+        <span>Tippen Sie, um das Bild aufzunehmen</span>
       </div>
     </div>
   </div>

@@ -4,7 +4,7 @@
     <button class="btn-icon-header" (click)="goHome()">
       <i class="pi pi-times"></i>
     </button>
-    <h1 class="app-title">Analysis</h1>
+    <h1 class="app-title">Analyse</h1>
     <div class="placeholder"></div>
   </header>
 
@@ -12,7 +12,7 @@
   <main class="analyzing-main">
     <!-- Captured Image Preview -->
     <div class="image-preview" *ngIf="capturedImage">
-      <img [src]="capturedImage" alt="Captured hoof image">
+      <img [src]="capturedImage" alt="Aufgenommenes Klauenbild">
     </div>
 
     <!-- Loading State -->
@@ -20,8 +20,8 @@
       <div class="loading-spinner">
         <div class="spinner"></div>
       </div>
-      <h2>Analyzing Image</h2>
-      <p>AI is processing the thermal data...</p>
+      <h2>Bild wird analysiert</h2>
+      <p>KI verarbeitet die Daten...</p>
     </div>
 
     <!-- Error State -->
@@ -29,11 +29,11 @@
       <div class="error-icon">
         <i class="pi pi-exclamation-circle"></i>
       </div>
-      <h2>Analysis Failed</h2>
+      <h2>Analyse fehlgeschlagen</h2>
       <p>{{ error }}</p>
       <button class="btn btn-primary" (click)="retryAnalysis()">
         <i class="pi pi-refresh"></i>
-        Try Again
+        Erneut versuchen
       </button>
     </div>
 
@@ -46,19 +46,19 @@
         <i class="pi pi-exclamation-triangle"></i>
       </div>
 
-      <h2>Analysis Complete</h2>
+      <h2>Analyse abgeschlossen</h2>
 
       <div class="result-summary">
         <div class="result-item">
-          <span class="label">Diagnosis</span>
+          <span class="label">Diagnose</span>
           <span class="value diagnosis">{{ analysisResult.diagnosis | titlecase }}</span>
         </div>
         <div class="result-item">
-          <span class="label">Confidence</span>
+          <span class="label">Konfidenz</span>
           <span class="value">{{ (analysisResult.confidence * 100).toFixed(0) }}%</span>
         </div>
         <div class="result-item">
-          <span class="label">Severity</span>
+          <span class="label">Schweregrad</span>
           <span class="value" [class]="'severity-' + analysisResult.severity">
             {{ analysisResult.severity | titlecase }}
           </span>
@@ -66,7 +66,7 @@
       </div>
 
       <div class="recommendations" *ngIf="analysisResult.recommendations.length > 0">
-        <h3>Recommendations</h3>
+        <h3>Empfehlungen</h3>
         <ul>
           <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
         </ul>
@@ -74,11 +74,11 @@
 
       <div class="alert-box" *ngIf="analysisResult.requiresVeterinaryAttention">
         <i class="pi pi-info-circle"></i>
-        <span>Veterinary attention recommended</span>
+        <span>Tierärztliche Behandlung empfohlen</span>
       </div>
 
       <button class="btn btn-primary" (click)="goToResults()">
-        View Full Report
+        Vollständigen Bericht anzeigen
         <i class="pi pi-arrow-right"></i>
       </button>
     </div>
