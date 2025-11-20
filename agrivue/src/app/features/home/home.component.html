@@ -1,1 +1,98 @@
-<p>home works!</p>
+<div class="home-container">
+  <!-- Header -->
+  <header class="home-header">
+    <div class="logo-section">
+      <div class="logo">
+        <i class="pi pi-eye"></i>
+      </div>
+      <div class="brand">
+        <h1 class="app-name">{{ appName }}</h1>
+        <p class="app-tagline">{{ appTagline }}</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="home-main">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-icon">
+        <i class="pi pi-camera"></i>
+      </div>
+      <h2 class="hero-title">Start Hoof Health Monitoring</h2>
+      <p class="hero-description">
+        Capture thermal images of cow hooves to detect early signs of lameness and hoof diseases.
+      </p>
+    </section>
+
+    <!-- Main Action Button -->
+    <div class="action-section">
+      <button class="btn btn-primary btn-lg scan-button" (click)="startNewScan()">
+        <i class="pi pi-camera"></i>
+        <span>Start New Scan</span>
+      </button>
+      <p class="action-hint">Point your camera at the cow's hoof</p>
+    </div>
+
+    <!-- Features Grid -->
+    <section class="features-section">
+      <h3 class="section-title">Features</h3>
+      <div class="features-grid">
+        <div class="feature-card card">
+          <div class="feature-icon">
+            <i class="pi pi-bolt"></i>
+          </div>
+          <h4>Real-Time Analysis</h4>
+          <p>Instant AI-powered thermal image analysis</p>
+        </div>
+
+        <div class="feature-card card">
+          <div class="feature-icon">
+            <i class="pi pi-chart-line"></i>
+          </div>
+          <h4>Health Tracking</h4>
+          <p>Monitor hoof health over time</p>
+        </div>
+
+        <div class="feature-card card">
+          <div class="feature-icon">
+            <i class="pi pi-bell"></i>
+          </div>
+          <h4>Early Detection</h4>
+          <p>Identify issues before they become serious</p>
+        </div>
+
+        <div class="feature-card card">
+          <div class="feature-icon">
+            <i class="pi pi-database"></i>
+          </div>
+          <h4>Offline Support</h4>
+          <p>Works without internet connection</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section">
+      <div class="info-card card">
+        <div class="info-icon">
+          <i class="pi pi-info-circle"></i>
+        </div>
+        <div class="info-content">
+          <h4>How it Works</h4>
+          <ol class="info-list">
+            <li>Position your camera to capture the cow's hoof</li>
+            <li>Take a thermal image using your device camera</li>
+            <li>AI analyzes temperature patterns instantly</li>
+            <li>Receive diagnosis and recommendations</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="home-footer">
+    <p class="footer-text">Professional cattle health monitoring solution</p>
+  </footer>
+</div>
