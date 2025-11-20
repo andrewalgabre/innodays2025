@@ -1,1 +1,86 @@
-<p>analyzing works!</p>
+<div class="analyzing-container">
+  <!-- Header -->
+  <header class="app-header">
+    <button class="btn-icon-header" (click)="goHome()">
+      <i class="pi pi-times"></i>
+    </button>
+    <h1 class="app-title">Analysis</h1>
+    <div class="placeholder"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="analyzing-main">
+    <!-- Captured Image Preview -->
+    <div class="image-preview" *ngIf="capturedImage">
+      <img [src]="capturedImage" alt="Captured hoof image">
+    </div>
+
+    <!-- Loading State -->
+    <div class="status-card" *ngIf="isAnalyzing">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+      <h2>Analyzing Image</h2>
+      <p>AI is processing the thermal data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="status-card error-card" *ngIf="error && !isAnalyzing">
+      <div class="error-icon">
+        <i class="pi pi-exclamation-circle"></i>
+      </div>
+      <h2>Analysis Failed</h2>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="retryAnalysis()">
+        <i class="pi pi-refresh"></i>
+        Try Again
+      </button>
+    </div>
+
+    <!-- Results Preview -->
+    <div class="results-preview" *ngIf="analysisResult && !isAnalyzing && !error">
+      <div class="result-icon success" *ngIf="analysisResult.diagnosis === 'healthy'">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="result-icon warning" *ngIf="analysisResult.diagnosis !== 'healthy'">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+
+      <h2>Analysis Complete</h2>
+
+      <div class="result-summary">
+        <div class="result-item">
+          <span class="label">Diagnosis</span>
+          <span class="value diagnosis">{{ analysisResult.diagnosis | titlecase }}</span>
+        </div>
+        <div class="result-item">
+          <span class="label">Confidence</span>
+          <span class="value">{{ (analysisResult.confidence * 100).toFixed(0) }}%</span>
+        </div>
+        <div class="result-item">
+          <span class="label">Severity</span>
+          <span class="value" [class]="'severity-' + analysisResult.severity">
+            {{ analysisResult.severity | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <div class="recommendations" *ngIf="analysisResult.recommendations.length > 0">
+        <h3>Recommendations</h3>
+        <ul>
+          <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
+        </ul>
+      </div>
+
+      <div class="alert-box" *ngIf="analysisResult.requiresVeterinaryAttention">
+        <i class="pi pi-info-circle"></i>
+        <span>Veterinary attention recommended</span>
+      </div>
+
+      <button class="btn btn-primary" (click)="goToResults()">
+        View Full Report
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+  </main>
+</div>

@@ -1,1 +1,104 @@
-<p>results works!</p>
+<div class="results-container" *ngIf="analysisResult">
+  <!-- Header -->
+  <header class="app-header">
+    <button class="btn-icon-header" (click)="goHome()">
+      <i class="pi pi-arrow-left"></i>
+    </button>
+    <h1 class="app-title">Scan Results</h1>
+    <div class="placeholder"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="results-main">
+    <!-- Captured Image -->
+    <div class="image-container" *ngIf="capturedImage">
+      <img [src]="capturedImage" alt="Captured hoof image">
+    </div>
+
+    <!-- Diagnosis Card -->
+    <div class="result-card diagnosis-card">
+      <div class="card-header">
+        <div class="icon-badge" [class.success]="analysisResult.diagnosis === 'healthy'"
+             [class.warning]="analysisResult.diagnosis !== 'healthy'">
+          <i class="pi pi-check-circle" *ngIf="analysisResult.diagnosis === 'healthy'"></i>
+          <i class="pi pi-exclamation-triangle" *ngIf="analysisResult.diagnosis !== 'healthy'"></i>
+        </div>
+        <div>
+          <h2>{{ analysisResult.diagnosis === 'healthy' ? 'Healthy' : analysisResult.diagnosis.replace('_', ' ') | titlecase }}</h2>
+          <p class="confidence">{{ (analysisResult.confidence * 100).toFixed(0) }}% confidence</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Severity Card -->
+    <div class="result-card">
+      <div class="card-title">
+        <i class="pi pi-chart-bar"></i>
+        <h3>Severity Level</h3>
+      </div>
+      <div class="severity-indicator">
+        <div class="severity-bar">
+          <div class="severity-fill" [class]="'severity-' + analysisResult.severity"
+               [style.width]="getSeverityWidth()"></div>
+        </div>
+        <span class="severity-label" [class]="'severity-' + analysisResult.severity">
+          {{ analysisResult.severity | titlecase }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Affected Areas -->
+    <div class="result-card" *ngIf="analysisResult.affectedAreas.length > 0">
+      <div class="card-title">
+        <i class="pi pi-map-marker"></i>
+        <h3>Affected Areas</h3>
+      </div>
+      <div class="areas-list">
+        <div class="area-item" *ngFor="let area of analysisResult.affectedAreas">
+          <div class="area-info">
+            <span class="area-name">{{ area.name }}</span>
+            <span class="area-temp">{{ area.temperature }}°C</span>
+          </div>
+          <div class="area-severity">
+            <div class="severity-dots">
+              <span class="dot" *ngFor="let i of [1,2,3,4,5]"
+                    [class.active]="i <= area.severity"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="result-card" *ngIf="analysisResult.recommendations.length > 0">
+      <div class="card-title">
+        <i class="pi pi-lightbulb"></i>
+        <h3>Recommendations</h3>
+      </div>
+      <ul class="recommendations-list">
+        <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
+      </ul>
+    </div>
+
+    <!-- Veterinary Alert -->
+    <div class="alert-card" *ngIf="analysisResult.requiresVeterinaryAttention">
+      <i class="pi pi-exclamation-circle"></i>
+      <div>
+        <h4>Veterinary Attention Required</h4>
+        <p>This condition requires professional evaluation by a veterinarian.</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button class="btn btn-secondary" (click)="goToHistory()">
+        <i class="pi pi-history"></i>
+        View History
+      </button>
+      <button class="btn btn-primary" (click)="newScan()">
+        <i class="pi pi-camera"></i>
+        New Scan
+      </button>
+    </div>
+  </main>
+</div>
