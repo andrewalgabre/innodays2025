@@ -47,25 +47,39 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       this.isLoading = true;
       this.error = null;
+      this.isCameraActive = false;
 
+      // Get the camera stream
       this.stream = await this.cameraService.startCamera(this.currentConfig);
 
-      // Wait a tick to ensure videoElement is available
-      setTimeout(() => {
+      // Set camera active FIRST so video element renders
+      this.isCameraActive = true;
+
+      // Wait for Angular to update the DOM
+      setTimeout(async () => {
         if (this.videoElement && this.stream) {
-          this.videoElement.nativeElement.srcObject = this.stream;
-          this.videoElement.nativeElement.play().then(() => {
-            this.isCameraActive = true;
+          const video = this.videoElement.nativeElement;
+          video.srcObject = this.stream;
+
+          try {
+            await video.play();
             this.isLoading = false;
-          }).catch((err) => {
-            this.error = 'Failed to play video: ' + err.message;
+          } catch (playErr: any) {
+            console.error('Play error:', playErr);
+            this.error = 'Failed to start video preview: ' + playErr.message;
             this.isLoading = false;
-          });
+            this.isCameraActive = false;
+          }
+        } else {
+          this.error = 'Video element not found';
+          this.isLoading = false;
+          this.isCameraActive = false;
         }
-      }, 100);
+      }, 150);
 
     } catch (err: any) {
-      this.error = err.message || 'Failed to start camera';
+      console.error('Camera error:', err);
+      this.error = err.message || 'Failed to access camera';
       this.isLoading = false;
       this.isCameraActive = false;
     }
