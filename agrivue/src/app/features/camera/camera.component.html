@@ -1,0 +1,85 @@
+<div class="camera-container">
+  <!-- Header -->
+  <header class="camera-header">
+    <button class="btn-icon btn-secondary" (click)="goBack()">
+      <i class="pi pi-arrow-left"></i>
+    </button>
+    <h1 class="camera-title">Hoof Scan</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <!-- Camera View -->
+  <div class="camera-view">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <i class="pi pi-spin pi-spinner loading-icon"></i>
+      <p>Starting camera...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="error-state">
+      <i class="pi pi-exclamation-circle error-icon"></i>
+      <h3>Camera Error</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="startCamera()">
+        <i class="pi pi-refresh"></i>
+        Retry
+      </button>
+    </div>
+
+    <!-- Video Preview -->
+    <video
+      #videoElement
+      *ngIf="isCameraActive && !isLoading"
+      class="video-preview"
+      autoplay
+      playsinline
+      muted
+    ></video>
+
+    <!-- Camera Guide Overlay -->
+    <div *ngIf="isCameraActive && !isLoading" class="guide-overlay">
+      <div class="guide-frame"></div>
+      <div class="guide-text">
+        <p>Position the cow's hoof within the frame</p>
+        <p class="text-muted">Ensure good lighting and clear view</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Controls -->
+  <div class="camera-controls" *ngIf="isCameraActive && !isLoading">
+    <!-- Top Controls -->
+    <div class="controls-top">
+      <button
+        class="btn-icon btn-secondary control-btn"
+        (click)="toggleFlash()"
+        [class.active]="flashEnabled"
+      >
+        <i class="pi" [class.pi-bolt]="!flashEnabled" [class.pi-bolt-slash]="flashEnabled"></i>
+      </button>
+
+      <button
+        class="btn-icon btn-secondary control-btn"
+        (click)="switchCamera()"
+      >
+        <i class="pi pi-refresh"></i>
+      </button>
+    </div>
+
+    <!-- Capture Button -->
+    <div class="controls-center">
+      <button class="capture-button" (click)="capturePhoto()">
+        <div class="capture-button-inner"></div>
+      </button>
+    </div>
+
+    <!-- Bottom Info -->
+    <div class="controls-bottom">
+      <div class="info-card">
+        <i class="pi pi-info-circle"></i>
+        <span>Tap to capture thermal image</span>
+      </div>
+    </div>
+  </div>
+</div>
