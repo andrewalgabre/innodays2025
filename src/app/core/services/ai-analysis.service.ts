@@ -59,21 +59,26 @@ export class AiAnalysisService {
             role: 'user',
             parts: [
               {
-                text: `Du bist ein Tierarzt-Experte für Rinderklauen. Analysiere dieses Bild einer Kuhklaue.
+                text: `Du bist ein deutscher Tierarzt-Experte für Rinderklauen. Analysiere dieses Bild einer Kuhklaue auf DEUTSCH.
 
-WICHTIG: Du MUSST immer eine Diagnose abgeben - entweder "gesund" wenn keine Probleme sichtbar sind, oder den Namen einer erkannten Krankheit.
+WICHTIG:
+- Antworte IMMER auf DEUTSCH
+- Du MUSST immer eine Diagnose abgeben
+- "confidence" ist ein Wert zwischen 0-100 (z.B. 95 für 95%)
 
 Mögliche Krankheiten:
-- Dermatitis digitalis (Mortellaro) - Hautveränderungen, Erosionen
-- Klauenrehe (Laminitis) - Fehlstellung, Hornveränderungen
-- Moderhinke - Schwellung zwischen den Klauen
-- Sohlengeschwür - Defekte an der Sohle
-- Weiße-Linie-Defekt - Spalt zwischen Horn und Sohle
-- Ballenfäule - Erosion am Ballen
+- Dermatitis digitalis (Mortellaro)
+- Klauenrehe (Laminitis)
+- Moderhinke
+- Sohlengeschwür
+- Weiße-Linie-Defekt
+- Ballenfäule
 
-Wenn die Klaue normal und gesund aussieht, antworte mit "gesund".
+Wenn die Klaue gesund aussieht, verwende "gesund" als diagnosis.
 
-Antworte NUR mit diesem exakten JSON-Format (keine zusätzlichen Erklärungen):
+Antworte NUR mit JSON (keine Markdown-Codeblöcke, keine Erklärungen):
+
+Beispiel für gesunde Klaue:
 {
   "diagnosis": "gesund",
   "confidence": 95,
@@ -83,7 +88,15 @@ Antworte NUR mit diesem exakten JSON-Format (keine zusätzlichen Erklärungen):
   "requires_veterinary_attention": false
 }
 
-Bei Krankheiten passe die Werte entsprechend an (diagnosis = Krankheitsname, severity = mild/moderate/severe, etc.).`,
+Beispiel für kranke Klaue:
+{
+  "diagnosis": "Dermatitis digitalis",
+  "confidence": 85,
+  "severity": "moderate",
+  "affected_areas": [{"name": "Zwischenklauenspalt", "severity": 3, "temperature": 38}],
+  "recommendations": ["Sofortige Reinigung und Desinfektion", "Antibiotische Behandlung empfohlen", "Tierarzt kontaktieren"],
+  "requires_veterinary_attention": true
+}`,
               },
               {
                 inline_data: {
@@ -148,9 +161,15 @@ Bei Krankheiten passe die Werte entsprechend an (diagnosis = Krankheitsname, sev
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
 
+        // Normalize confidence to 0-1 range (Gemini might return 0-100 or 0-1)
+        let confidence = parsedData.confidence || 0;
+        if (confidence > 1) {
+          confidence = confidence / 100; // Convert 75 to 0.75
+        }
+
         return {
           diagnosis: this.mapDiagnosis(parsedData.diagnosis || 'unknown'),
-          confidence: parsedData.confidence || 0,
+          confidence: confidence,
           affectedAreas: parsedData.affected_areas || [],
           recommendations: parsedData.recommendations || [],
           severity: this.mapSeverity(parsedData.severity),
