@@ -59,21 +59,21 @@ export class AiAnalysisService {
             role: 'user',
             parts: [
               {
-                text: `Analyze this cow hoof image for potential diseases. Look for signs of:
-- Digital Dermatitis
-- Laminitis
-- Foot Rot
-- Sole Ulcer
-- White Line Disease
-- Heel Erosion
+                text: `Analysiere dieses Kuhklauenbild auf mögliche Krankheiten. Achte auf Anzeichen von:
+- Dermatitis digitalis (Mortellaro)
+- Klauenrehe (Laminitis)
+- Moderhinke
+- Sohlengeschwür
+- Weiße-Linie-Defekt
+- Ballenfäule
 
-Provide your analysis in JSON format with the following structure:
+Liefere deine Analyse im JSON-Format mit folgender Struktur (die Werte sollten auf Deutsch sein):
 {
-  "diagnosis": "condition name or 'healthy'",
+  "diagnosis": "Krankheitsname oder 'gesund'",
   "confidence": 0-100,
   "severity": "none/mild/moderate/severe",
-  "affected_areas": [{"name": "area name", "severity": 1-5, "temperature": estimated temp}],
-  "recommendations": ["recommendation 1", "recommendation 2"],
+  "affected_areas": [{"name": "Bereichsname", "severity": 1-5, "temperature": geschätzte Temperatur}],
+  "recommendations": ["Empfehlung 1", "Empfehlung 2"],
   "requires_veterinary_attention": true/false
 }`,
               },

@@ -4,7 +4,7 @@
     <button class="btn-icon-header" (click)="goHome()">
       <i class="pi pi-arrow-left"></i>
     </button>
-    <h1 class="app-title">Scan Results</h1>
+    <h1 class="app-title">Scan-Ergebnisse</h1>
     <div class="placeholder"></div>
   </header>
 
@@ -12,7 +12,7 @@
   <main class="results-main">
     <!-- Captured Image -->
     <div class="image-container" *ngIf="capturedImage">
-      <img [src]="capturedImage" alt="Captured hoof image">
+      <img [src]="capturedImage" alt="Aufgenommenes Klauenbild">
     </div>
 
     <!-- Diagnosis Card -->
@@ -24,8 +24,8 @@
           <i class="pi pi-exclamation-triangle" *ngIf="analysisResult.diagnosis !== 'healthy'"></i>
         </div>
         <div>
-          <h2>{{ analysisResult.diagnosis === 'healthy' ? 'Healthy' : analysisResult.diagnosis.replace('_', ' ') | titlecase }}</h2>
-          <p class="confidence">{{ (analysisResult.confidence * 100).toFixed(0) }}% confidence</p>
+          <h2>{{ analysisResult.diagnosis === 'healthy' ? 'Gesund' : analysisResult.diagnosis.replace('_', ' ') | titlecase }}</h2>
+          <p class="confidence">{{ (analysisResult.confidence * 100).toFixed(0) }}% Konfidenz</p>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
     <div class="result-card">
       <div class="card-title">
         <i class="pi pi-chart-bar"></i>
-        <h3>Severity Level</h3>
+        <h3>Schweregrad</h3>
       </div>
       <div class="severity-indicator">
         <div class="severity-bar">
@@ -51,7 +51,7 @@
     <div class="result-card" *ngIf="analysisResult.affectedAreas.length > 0">
       <div class="card-title">
         <i class="pi pi-map-marker"></i>
-        <h3>Affected Areas</h3>
+        <h3>Betroffene Bereiche</h3>
       </div>
       <div class="areas-list">
         <div class="area-item" *ngFor="let area of analysisResult.affectedAreas">
@@ -73,7 +73,7 @@
     <div class="result-card" *ngIf="analysisResult.recommendations.length > 0">
       <div class="card-title">
         <i class="pi pi-lightbulb"></i>
-        <h3>Recommendations</h3>
+        <h3>Empfehlungen</h3>
       </div>
       <ul class="recommendations-list">
         <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
@@ -84,8 +84,8 @@
     <div class="alert-card" *ngIf="analysisResult.requiresVeterinaryAttention">
       <i class="pi pi-exclamation-circle"></i>
       <div>
-        <h4>Veterinary Attention Required</h4>
-        <p>This condition requires professional evaluation by a veterinarian.</p>
+        <h4>Tierärztliche Behandlung erforderlich</h4>
+        <p>Dieser Zustand erfordert eine professionelle tierärztliche Untersuchung.</p>
       </div>
     </div>
 
@@ -93,11 +93,11 @@
     <div class="actions">
       <button class="btn btn-secondary" (click)="goToHistory()">
         <i class="pi pi-history"></i>
-        View History
+        Verlauf anzeigen
       </button>
       <button class="btn btn-primary" (click)="newScan()">
         <i class="pi pi-camera"></i>
-        New Scan
+        Neuer Scan
       </button>
     </div>
   </main>
