@@ -59,23 +59,31 @@ export class AiAnalysisService {
             role: 'user',
             parts: [
               {
-                text: `Analysiere dieses Kuhklauenbild auf mögliche Krankheiten. Achte auf Anzeichen von:
-- Dermatitis digitalis (Mortellaro)
-- Klauenrehe (Laminitis)
-- Moderhinke
-- Sohlengeschwür
-- Weiße-Linie-Defekt
-- Ballenfäule
+                text: `Du bist ein Tierarzt-Experte für Rinderklauen. Analysiere dieses Bild einer Kuhklaue.
 
-Liefere deine Analyse im JSON-Format mit folgender Struktur (die Werte sollten auf Deutsch sein):
+WICHTIG: Du MUSST immer eine Diagnose abgeben - entweder "gesund" wenn keine Probleme sichtbar sind, oder den Namen einer erkannten Krankheit.
+
+Mögliche Krankheiten:
+- Dermatitis digitalis (Mortellaro) - Hautveränderungen, Erosionen
+- Klauenrehe (Laminitis) - Fehlstellung, Hornveränderungen
+- Moderhinke - Schwellung zwischen den Klauen
+- Sohlengeschwür - Defekte an der Sohle
+- Weiße-Linie-Defekt - Spalt zwischen Horn und Sohle
+- Ballenfäule - Erosion am Ballen
+
+Wenn die Klaue normal und gesund aussieht, antworte mit "gesund".
+
+Antworte NUR mit diesem exakten JSON-Format (keine zusätzlichen Erklärungen):
 {
-  "diagnosis": "Krankheitsname oder 'gesund'",
-  "confidence": 0-100,
-  "severity": "none/mild/moderate/severe",
-  "affected_areas": [{"name": "Bereichsname", "severity": 1-5, "temperature": geschätzte Temperatur}],
-  "recommendations": ["Empfehlung 1", "Empfehlung 2"],
-  "requires_veterinary_attention": true/false
-}`,
+  "diagnosis": "gesund",
+  "confidence": 95,
+  "severity": "none",
+  "affected_areas": [],
+  "recommendations": ["Regelmäßige Klauenpflege fortsetzen", "Nächste Kontrolle in 3 Monaten"],
+  "requires_veterinary_attention": false
+}
+
+Bei Krankheiten passe die Werte entsprechend an (diagnosis = Krankheitsname, severity = mild/moderate/severe, etc.).`,
               },
               {
                 inline_data: {
