@@ -48,8 +48,8 @@ export class AiAnalysisService {
       const base64Image = await this.blobToBase64(imageBlob);
       console.log('Base64 conversion complete, length:', base64Image.length);
 
-      // Gemini API endpoint
-      const url = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`;
+      // Gemini API endpoint - using Gemini 2.5 Pro for better analysis
+      const url = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/gemini-2.5-pro:generateContent?key=${this.apiKey}`;
       console.log('Gemini API URL:', url);
 
       // Prepare Gemini request payload
