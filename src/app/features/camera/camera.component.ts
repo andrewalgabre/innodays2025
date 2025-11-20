@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CameraService } from '../../core/services/camera.service';
@@ -10,7 +10,7 @@ import { CameraConfig, DEFAULT_CAMERA_CONFIG } from '../../core/models';
   templateUrl: './camera.component.html',
   styleUrl: './camera.component.css',
 })
-export class CameraComponent implements OnInit, OnDestroy {
+export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('videoElement', { static: false }) videoElement!: ElementRef<HTMLVideoElement>;
 
   isLoading = true;
@@ -18,13 +18,19 @@ export class CameraComponent implements OnInit, OnDestroy {
   isCameraActive = false;
   currentConfig: CameraConfig = DEFAULT_CAMERA_CONFIG;
   flashEnabled = false;
+  private stream: MediaStream | null = null;
 
   constructor(
     private cameraService: CameraService,
     private router: Router
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
+    // Don't start camera here, wait for view to be ready
+  }
+
+  async ngAfterViewInit() {
+    // Start camera after view is initialized
     try {
       await this.startCamera();
     } catch (err) {
@@ -42,15 +48,22 @@ export class CameraComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.error = null;
 
-      const stream = await this.cameraService.startCamera(this.currentConfig);
+      this.stream = await this.cameraService.startCamera(this.currentConfig);
 
-      if (this.videoElement) {
-        this.videoElement.nativeElement.srcObject = stream;
-        await this.videoElement.nativeElement.play();
-      }
+      // Wait a tick to ensure videoElement is available
+      setTimeout(() => {
+        if (this.videoElement && this.stream) {
+          this.videoElement.nativeElement.srcObject = this.stream;
+          this.videoElement.nativeElement.play().then(() => {
+            this.isCameraActive = true;
+            this.isLoading = false;
+          }).catch((err) => {
+            this.error = 'Failed to play video: ' + err.message;
+            this.isLoading = false;
+          });
+        }
+      }, 100);
 
-      this.isCameraActive = true;
-      this.isLoading = false;
     } catch (err: any) {
       this.error = err.message || 'Failed to start camera';
       this.isLoading = false;
