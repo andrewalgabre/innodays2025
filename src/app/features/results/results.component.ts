@@ -2,16 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AnalysisResult } from '../../core/models/scan.model';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-results',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './results.component.html',
   styleUrl: './results.component.css',
 })
 export class ResultsComponent implements OnInit {
   analysisResult: AnalysisResult | null = null;
   capturedImage: string | null = null;
+
+  // Lucide icons
 
   constructor(private router: Router) {
     const navigation = this.router.getCurrentNavigation();

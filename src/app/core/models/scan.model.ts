@@ -21,15 +21,8 @@ export interface AnalysisResult {
   requiresVeterinaryAttention: boolean;
 }
 
-export type DiagnosisType =
-  | 'healthy'
-  | 'laminitis'
-  | 'digital_dermatitis'
-  | 'sole_ulcer'
-  | 'white_line_disease'
-  | 'interdigital_dermatitis'
-  | 'heel_erosion'
-  | 'unknown';
+// Diagnosis is returned in German from AI, so we accept any string
+export type DiagnosisType = string;
 
 export interface AffectedArea {
   name: string;

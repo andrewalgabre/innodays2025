@@ -225,13 +225,14 @@ Beispiel für kranke Klaue:
    */
   private getMockAnalysisResult(): AnalysisResult {
     return {
-      diagnosis: 'healthy',
+      diagnosis: 'gesund',
       confidence: 0.92,
+      summary: 'Die Klaue zeigt keine Anzeichen von Krankheiten oder Verletzungen. Die Hornqualität ist gut und die Anatomie ist normal.',
       affectedAreas: [],
       recommendations: [
-        'Continue regular hoof maintenance',
-        'Monitor for any changes in gait or behavior',
-        'Schedule next inspection in 3 months',
+        'Regelmäßige Klauenpflege fortsetzen',
+        'Auf Veränderungen im Gang oder Verhalten achten',
+        'Nächste Kontrolle in 3 Monaten einplanen',
       ],
       severity: 'none',
       requiresVeterinaryAttention: false,

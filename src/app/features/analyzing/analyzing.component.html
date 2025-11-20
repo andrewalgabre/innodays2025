@@ -2,7 +2,7 @@
   <!-- Header -->
   <header class="app-header">
     <button class="btn-icon-header" (click)="goHome()">
-      <i class="pi pi-times"></i>
+      <lucide-icon name="x"></lucide-icon>
     </button>
     <h1 class="app-title">Analyse</h1>
     <div class="placeholder"></div>
@@ -18,7 +18,7 @@
     <!-- Loading State -->
     <div class="status-card" *ngIf="isAnalyzing">
       <div class="loading-spinner">
-        <div class="spinner"></div>
+        <lucide-icon name="loader-2" class="loading-icon animate-spin"></lucide-icon>
       </div>
       <h2>Bild wird analysiert</h2>
       <p>KI verarbeitet die Daten...</p>
@@ -27,23 +27,23 @@
     <!-- Error State -->
     <div class="status-card error-card" *ngIf="error && !isAnalyzing">
       <div class="error-icon">
-        <i class="pi pi-exclamation-circle"></i>
+        <lucide-icon name="alert-circle"></lucide-icon>
       </div>
       <h2>Analyse fehlgeschlagen</h2>
       <p>{{ error }}</p>
       <button class="btn btn-primary" (click)="retryAnalysis()">
-        <i class="pi pi-refresh"></i>
+        <lucide-icon name="rotate-cw"></lucide-icon>
         Erneut versuchen
       </button>
     </div>
 
     <!-- Results Preview -->
     <div class="results-preview" *ngIf="analysisResult && !isAnalyzing && !error">
-      <div class="result-icon success" *ngIf="analysisResult.diagnosis === 'healthy'">
-        <i class="pi pi-check-circle"></i>
+      <div class="result-icon success" *ngIf="analysisResult.diagnosis === 'gesund'">
+        <lucide-icon name="check-circle-2"></lucide-icon>
       </div>
-      <div class="result-icon warning" *ngIf="analysisResult.diagnosis !== 'healthy'">
-        <i class="pi pi-exclamation-triangle"></i>
+      <div class="result-icon warning" *ngIf="analysisResult.diagnosis !== 'gesund'">
+        <lucide-icon name="alert-triangle"></lucide-icon>
       </div>
 
       <h2>Analyse abgeschlossen</h2>
@@ -78,13 +78,13 @@
       </div>
 
       <div class="alert-box" *ngIf="analysisResult.requiresVeterinaryAttention">
-        <i class="pi pi-info-circle"></i>
+        <lucide-icon name="alert-circle"></lucide-icon>
         <span>Tierärztliche Behandlung empfohlen</span>
       </div>
 
       <button class="btn btn-primary" (click)="goToResults()">
         Vollständigen Bericht anzeigen
-        <i class="pi pi-arrow-right"></i>
+        <lucide-icon name="arrow-right"></lucide-icon>
       </button>
     </div>
   </main>

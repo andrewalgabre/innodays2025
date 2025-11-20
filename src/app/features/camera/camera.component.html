@@ -2,7 +2,7 @@
   <!-- Header -->
   <header class="camera-header">
     <button class="btn-icon btn-secondary" (click)="goBack()">
-      <i class="pi pi-arrow-left"></i>
+      <lucide-icon name="arrow-left"></lucide-icon>
     </button>
     <h1 class="camera-title">Klauen-Scan</h1>
     <div class="spacer"></div>
@@ -12,17 +12,17 @@
   <div class="camera-view">
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-state">
-      <i class="pi pi-spin pi-spinner loading-icon"></i>
+      <lucide-icon name="loader-2" class="loading-icon animate-spin"></lucide-icon>
       <p>Kamera wird gestartet...</p>
     </div>
 
     <!-- Error State -->
     <div *ngIf="error && !isLoading" class="error-state">
-      <i class="pi pi-exclamation-circle error-icon"></i>
+      <lucide-icon name="alert-circle" class="error-icon"></lucide-icon>
       <h3>Kamera-Fehler</h3>
       <p>{{ error }}</p>
       <button class="btn btn-primary" (click)="startCamera()">
-        <i class="pi pi-refresh"></i>
+        <lucide-icon name="rotate-cw"></lucide-icon>
         Erneut versuchen
       </button>
     </div>
@@ -56,19 +56,22 @@
         (click)="toggleFlash()"
         [class.active]="flashEnabled"
       >
-        <i class="pi" [class.pi-bolt]="!flashEnabled" [class.pi-bolt-slash]="flashEnabled"></i>
+        <lucide-icon name="rotate-cw"></lucide-icon>
       </button>
 
       <button
         class="btn-icon btn-secondary control-btn"
         (click)="switchCamera()"
       >
-        <i class="pi pi-refresh"></i>
+        <lucide-icon name="rotate-cw"></lucide-icon>
       </button>
     </div>
 
     <!-- Capture Button -->
     <div class="controls-center">
+      <button class="gallery-button" (click)="selectImageFromGallery()">
+        <lucide-icon name="image"></lucide-icon>
+      </button>
       <button class="capture-button" (click)="capturePhoto()">
         <div class="capture-button-inner"></div>
       </button>
@@ -77,7 +80,7 @@
     <!-- Bottom Info -->
     <div class="controls-bottom">
       <div class="info-card">
-        <i class="pi pi-info-circle"></i>
+        <lucide-icon name="info"></lucide-icon>
         <span>Tippen Sie, um das Bild aufzunehmen</span>
       </div>
     </div>

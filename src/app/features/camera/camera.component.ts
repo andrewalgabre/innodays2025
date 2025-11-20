@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { CameraService } from '../../core/services/camera.service';
 import { ImageTransferService } from '../../core/services/image-transfer.service';
 import { CameraConfig, DEFAULT_CAMERA_CONFIG } from '../../core/models';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-camera',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './camera.component.html',
   styleUrl: './camera.component.css',
 })
@@ -124,5 +125,32 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   goBack() {
     this.router.navigate(['/home']);
+  }
+
+  selectImageFromGallery() {
+    // Trigger file input click
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        this.handleImageSelection(file);
+      }
+    };
+    fileInput.click();
+  }
+
+  async handleImageSelection(file: File) {
+    try {
+      // Convert File to Blob
+      const blob = new Blob([file], { type: file.type });
+
+      // Store image blob in service and navigate
+      this.imageTransferService.setImage(blob);
+      this.router.navigate(['/analyzing']);
+    } catch (err: any) {
+      this.error = err.message || 'Failed to load image';
+    }
   }
 }

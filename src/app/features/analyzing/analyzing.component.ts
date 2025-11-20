@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { AiAnalysisService } from '../../core/services/ai-analysis.service';
 import { ImageTransferService } from '../../core/services/image-transfer.service';
 import { AnalysisResult } from '../../core/models/scan.model';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-analyzing',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './analyzing.component.html',
   styleUrl: './analyzing.component.css',
 })

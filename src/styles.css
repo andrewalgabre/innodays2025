@@ -184,3 +184,30 @@ h6 { font-size: 1rem; }
 .bg-primary { background-color: var(--primary-500); }
 .bg-primary-light { background-color: var(--primary-50); }
 .border-primary { border-color: var(--primary-500); }
+
+/* Lucide Icons Global Styles */
+lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+lucide-icon svg {
+  width: 1em;
+  height: 1em;
+  stroke-width: 2;
+}
+
+/* Animation for spinning icons */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

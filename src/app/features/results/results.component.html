@@ -2,7 +2,7 @@
   <!-- Header -->
   <header class="app-header">
     <button class="btn-icon-header" (click)="goHome()">
-      <i class="pi pi-arrow-left"></i>
+      <lucide-icon name="arrow-left"></lucide-icon>
     </button>
     <h1 class="app-title">Scan-Ergebnisse</h1>
     <div class="placeholder"></div>
@@ -18,13 +18,13 @@
     <!-- Diagnosis Card -->
     <div class="result-card diagnosis-card">
       <div class="card-header">
-        <div class="icon-badge" [class.success]="analysisResult.diagnosis === 'healthy'"
-             [class.warning]="analysisResult.diagnosis !== 'healthy'">
-          <i class="pi pi-check-circle" *ngIf="analysisResult.diagnosis === 'healthy'"></i>
-          <i class="pi pi-exclamation-triangle" *ngIf="analysisResult.diagnosis !== 'healthy'"></i>
+        <div class="icon-badge" [class.success]="analysisResult.diagnosis === 'gesund'"
+             [class.warning]="analysisResult.diagnosis !== 'gesund'">
+          <lucide-icon name="check-circle-2" *ngIf="analysisResult.diagnosis === 'gesund'"></lucide-icon>
+          <lucide-icon name="alert-triangle" *ngIf="analysisResult.diagnosis !== 'gesund'"></lucide-icon>
         </div>
         <div>
-          <h2>{{ analysisResult.diagnosis === 'healthy' ? 'Gesund' : analysisResult.diagnosis.replace('_', ' ') | titlecase }}</h2>
+          <h2>{{ analysisResult.diagnosis | titlecase }}</h2>
           <p class="confidence">{{ (analysisResult.confidence * 100).toFixed(0) }}% Konfidenz</p>
         </div>
       </div>
@@ -36,7 +36,7 @@
     <!-- Severity Card -->
     <div class="result-card">
       <div class="card-title">
-        <i class="pi pi-chart-bar"></i>
+        <lucide-icon name="bar-chart-3"></lucide-icon>
         <h3>Schweregrad</h3>
       </div>
       <div class="severity-indicator">
@@ -53,7 +53,7 @@
     <!-- Affected Areas -->
     <div class="result-card" *ngIf="analysisResult.affectedAreas.length > 0">
       <div class="card-title">
-        <i class="pi pi-map-marker"></i>
+        <lucide-icon name="map-pin"></lucide-icon>
         <h3>Betroffene Bereiche</h3>
       </div>
       <div class="areas-list">
@@ -75,7 +75,7 @@
     <!-- Recommendations -->
     <div class="result-card" *ngIf="analysisResult.recommendations.length > 0">
       <div class="card-title">
-        <i class="pi pi-lightbulb"></i>
+        <lucide-icon name="lightbulb"></lucide-icon>
         <h3>Empfehlungen</h3>
       </div>
       <ul class="recommendations-list">
@@ -85,7 +85,7 @@
 
     <!-- Veterinary Alert -->
     <div class="alert-card" *ngIf="analysisResult.requiresVeterinaryAttention">
-      <i class="pi pi-exclamation-circle"></i>
+      <lucide-icon name="alert-circle"></lucide-icon>
       <div>
         <h4>Tierärztliche Behandlung erforderlich</h4>
         <p>Dieser Zustand erfordert eine professionelle tierärztliche Untersuchung.</p>
@@ -95,11 +95,11 @@
     <!-- Action Buttons -->
     <div class="actions">
       <button class="btn btn-secondary" (click)="goToHistory()">
-        <i class="pi pi-history"></i>
+        <lucide-icon name="history"></lucide-icon>
         Verlauf anzeigen
       </button>
       <button class="btn btn-primary" (click)="newScan()">
-        <i class="pi pi-camera"></i>
+        <lucide-icon name="camera"></lucide-icon>
         Neuer Scan
       </button>
     </div>
