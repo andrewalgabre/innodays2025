@@ -14,6 +14,7 @@ export interface Scan {
 export interface AnalysisResult {
   diagnosis: DiagnosisType;
   confidence: number;
+  summary?: string;
   affectedAreas: AffectedArea[];
   recommendations: string[];
   severity: 'none' | 'mild' | 'moderate' | 'severe';

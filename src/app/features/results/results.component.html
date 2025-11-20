@@ -28,6 +28,9 @@
           <p class="confidence">{{ (analysisResult.confidence * 100).toFixed(0) }}% Konfidenz</p>
         </div>
       </div>
+      <p class="diagnosis-summary" *ngIf="analysisResult.summary">
+        {{ analysisResult.summary }}
+      </p>
     </div>
 
     <!-- Severity Card -->

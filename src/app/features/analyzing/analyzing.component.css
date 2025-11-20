@@ -146,7 +146,16 @@
   font-size: 1.375rem;
   font-weight: 600;
   color: var(--text-900);
+  margin: 0 0 0.75rem 0;
+}
+
+.summary-text {
+  font-size: 0.9375rem;
+  color: var(--text-700);
+  line-height: 1.6;
   margin: 0 0 1.5rem 0;
+  text-align: center;
+  padding: 0 1rem;
 }
 
 .result-summary {

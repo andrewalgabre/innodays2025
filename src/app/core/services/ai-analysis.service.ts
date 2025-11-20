@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AnalysisResult, DiagnosisType } from '../models/scan.model';
+import { AnalysisResult } from '../models/scan.model';
 import { ThermalData } from '../models/thermal.model';
 
 interface VertexAIResponse {
@@ -83,6 +83,7 @@ Beispiel für gesunde Klaue:
   "diagnosis": "gesund",
   "confidence": 95,
   "severity": "none",
+  "summary": "Die Klaue zeigt keine Anzeichen von Krankheiten oder Verletzungen. Die Hornqualität ist gut und die Anatomie ist normal.",
   "affected_areas": [],
   "recommendations": ["Regelmäßige Klauenpflege fortsetzen", "Nächste Kontrolle in 3 Monaten"],
   "requires_veterinary_attention": false
@@ -93,6 +94,7 @@ Beispiel für kranke Klaue:
   "diagnosis": "Dermatitis digitalis",
   "confidence": 85,
   "severity": "moderate",
+  "summary": "Die Klaue zeigt deutliche Anzeichen von Dermatitis digitalis mit Erosionen im Zwischenklauenspalt. Die Entzündung ist moderat ausgeprägt.",
   "affected_areas": [{"name": "Zwischenklauenspalt", "severity": 3, "temperature": 38}],
   "recommendations": ["Sofortige Reinigung und Desinfektion", "Antibiotische Behandlung empfohlen", "Tierarzt kontaktieren"],
   "requires_veterinary_attention": true
@@ -156,8 +158,13 @@ Beispiel für kranke Klaue:
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
       console.log('Gemini text response:', text);
 
+      // Remove markdown code blocks if present
+      const cleanedText = text
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '');
+
       // Try to extract JSON from the response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
 
@@ -168,8 +175,9 @@ Beispiel für kranke Klaue:
         }
 
         return {
-          diagnosis: this.mapDiagnosis(parsedData.diagnosis || 'unknown'),
+          diagnosis: parsedData.diagnosis || 'Unbekannt', // Use diagnosis as-is
           confidence: confidence,
+          summary: parsedData.summary || '',
           affectedAreas: parsedData.affected_areas || [],
           recommendations: parsedData.recommendations || [],
           severity: this.mapSeverity(parsedData.severity),
@@ -188,37 +196,28 @@ Beispiel für kranke Klaue:
   }
 
   /**
-   * Map diagnosis string to DiagnosisType
-   */
-  private mapDiagnosis(diagnosis: string): DiagnosisType {
-    const diagnosisMap: Record<string, DiagnosisType> = {
-      healthy: 'healthy',
-      laminitis: 'laminitis',
-      digital_dermatitis: 'digital_dermatitis',
-      sole_ulcer: 'sole_ulcer',
-      white_line_disease: 'white_line_disease',
-      interdigital_dermatitis: 'interdigital_dermatitis',
-      heel_erosion: 'heel_erosion',
-    };
-
-    return diagnosisMap[diagnosis.toLowerCase()] || 'unknown';
-  }
-
-  /**
-   * Map severity string to severity type
+   * Map severity string to severity type (handles German and English)
    */
   private mapSeverity(
     severity?: string
   ): 'none' | 'mild' | 'moderate' | 'severe' {
-    const severityMap: Record<string, 'none' | 'mild' | 'moderate' | 'severe'> =
-      {
-        none: 'none',
-        mild: 'mild',
-        moderate: 'moderate',
-        severe: 'severe',
-      };
+    if (!severity) return 'none';
 
-    return severityMap[severity?.toLowerCase() || 'none'] || 'none';
+    const lower = severity.toLowerCase();
+
+    // German mappings
+    if (lower.includes('keine') || lower.includes('gesund')) return 'none';
+    if (lower.includes('leicht') || lower.includes('gering')) return 'mild';
+    if (lower.includes('mittel') || lower.includes('mäßig')) return 'moderate';
+    if (lower.includes('schwer') || lower.includes('stark')) return 'severe';
+
+    // English mappings (fallback)
+    if (lower.includes('none')) return 'none';
+    if (lower.includes('mild')) return 'mild';
+    if (lower.includes('moderate')) return 'moderate';
+    if (lower.includes('severe')) return 'severe';
+
+    return 'none';
   }
 
   /**

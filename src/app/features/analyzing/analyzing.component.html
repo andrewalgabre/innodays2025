@@ -48,6 +48,11 @@
 
       <h2>Analyse abgeschlossen</h2>
 
+      <!-- Summary Text -->
+      <p class="summary-text" *ngIf="analysisResult.summary">
+        {{ analysisResult.summary }}
+      </p>
+
       <div class="result-summary">
         <div class="result-item">
           <span class="label">Diagnose</span>
