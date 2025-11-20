@@ -27,17 +27,20 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: 'agrivue/package-lock.json'
 
       - name: Install dependencies
+        working-directory: agrivue
         run: npm ci
 
       - name: Build Angular app
+        working-directory: agrivue
         run: npm run build -- --base-href=/innodays2025/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist/agrivue/browser
+          path: agrivue/dist/agrivue/browser
 
   deploy:
     environment:
