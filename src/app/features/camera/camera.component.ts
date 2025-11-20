@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } fr
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CameraService } from '../../core/services/camera.service';
-import { AiAnalysisService } from '../../core/services/ai-analysis.service';
+import { ImageTransferService } from '../../core/services/image-transfer.service';
 import { CameraConfig, DEFAULT_CAMERA_CONFIG } from '../../core/models';
 
 @Component({
@@ -23,7 +23,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private cameraService: CameraService,
-    private aiAnalysisService: AiAnalysisService,
+    private imageTransferService: ImageTransferService,
     private router: Router
   ) {}
 
@@ -102,10 +102,9 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         this.videoElement.nativeElement
       );
 
-      // Navigate to analyzing page with the image
-      this.router.navigate(['/analyzing'], {
-        state: { imageBlob: capturedImage }
-      });
+      // Store image blob in service and navigate
+      this.imageTransferService.setImage(capturedImage.blob);
+      this.router.navigate(['/analyzing']);
     } catch (err: any) {
       this.error = err.message || 'Failed to capture image';
     }

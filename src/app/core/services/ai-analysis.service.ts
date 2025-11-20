@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { AnalysisResult, DiagnosisType } from '../models/scan.model';
 import { ThermalData } from '../models/thermal.model';
@@ -21,55 +21,88 @@ interface VertexAIResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AiAnalysisService {
-  private readonly apiKey = 'AQ.Ab8RN6JOAbfKoMu-2v7p4fZhJtU8sqeQ0BxIw0tFKYhaZF0eAQ';
+  private readonly apiKey =
+    'AQ.Ab8RN6JOAbfKoMu-2v7p4fZhJtU8sqeQ0BxIw0tFKYhaZF0eAQ';
   private readonly projectId = 'prj-bison-3097627891-rindern';
   private readonly location = 'us-central1';
-  private readonly endpointId = 'YOUR_ENDPOINT_ID'; // User needs to provide this
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Analyze thermal image using Vertex AI
    */
-  async analyze(imageBlob: Blob, thermalData?: ThermalData): Promise<AnalysisResult> {
+  async analyze(
+    imageBlob: Blob,
+    thermalData?: ThermalData
+  ): Promise<AnalysisResult> {
+    console.log('AI Analysis Service - analyze() called');
+    console.log('Image blob size:', imageBlob.size, 'type:', imageBlob.type);
+
     try {
       // Convert blob to base64
-      const base64Image = await this.blobToBase64(imageBlob);
+      console.log('Converting blob to base64...');
 
-      // Prepare request payload
+      const base64Image = await this.blobToBase64(imageBlob);
+      console.log('Base64 conversion complete, length:', base64Image.length);
+
+      // Gemini API endpoint
+      const url = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`;
+      console.log('Gemini API URL:', url);
+
+      // Prepare Gemini request payload
       const payload = {
-        instances: [{
-          image: base64Image,
-          thermal_data: thermalData ? {
-            min_temp: thermalData.minTemp,
-            max_temp: thermalData.maxTemp,
-            avg_temp: thermalData.avgTemp,
-            temperatures: thermalData.temperatures
-          } : null
-        }]
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `Analyze this cow hoof image for potential diseases. Look for signs of:
+- Digital Dermatitis
+- Laminitis
+- Foot Rot
+- Sole Ulcer
+- White Line Disease
+- Heel Erosion
+
+Provide your analysis in JSON format with the following structure:
+{
+  "diagnosis": "condition name or 'healthy'",
+  "confidence": 0-100,
+  "severity": "none/mild/moderate/severe",
+  "affected_areas": [{"name": "area name", "severity": 1-5, "temperature": estimated temp}],
+  "recommendations": ["recommendation 1", "recommendation 2"],
+  "requires_veterinary_attention": true/false
+}`,
+              },
+              {
+                inline_data: {
+                  mime_type: imageBlob.type || 'image/jpeg',
+                  data: base64Image,
+                },
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          topP: 0.8,
+          topK: 40,
+          maxOutputTokens: 2048,
+        },
       };
 
-      // Vertex AI endpoint URL
-      const url = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/endpoints/${this.endpointId}:predict`;
+      console.log('Making HTTP request to Gemini...');
+      const response = await firstValueFrom(this.http.post<any>(url, payload));
+      console.log('Gemini response received:', response);
 
-      // Make request
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
-      });
-
-      const response = await firstValueFrom(
-        this.http.post<VertexAIResponse>(url, payload, { headers })
-      );
-
-      // Parse response
-      return this.parseVertexAIResponse(response);
-
+      // Parse Gemini response
+      return this.parseGeminiResponse(response);
     } catch (error: any) {
-      console.error('Vertex AI analysis error:', error);
+      console.error('Gemini analysis error:', error);
+      console.log('Falling back to mock data');
 
       // Return mock result for POC if API fails
       return this.getMockAnalysisResult();
@@ -94,19 +127,37 @@ export class AiAnalysisService {
   }
 
   /**
-   * Parse Vertex AI response into AnalysisResult
+   * Parse Gemini response into AnalysisResult
    */
-  private parseVertexAIResponse(response: VertexAIResponse): AnalysisResult {
-    const prediction = response.predictions[0];
+  private parseGeminiResponse(response: any): AnalysisResult {
+    try {
+      // Extract text from Gemini response
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      console.log('Gemini text response:', text);
 
-    return {
-      diagnosis: this.mapDiagnosis(prediction.diagnosis || 'unknown'),
-      confidence: prediction.confidence || 0,
-      affectedAreas: prediction.affected_areas || [],
-      recommendations: prediction.recommendations || [],
-      severity: this.mapSeverity(prediction.severity),
-      requiresVeterinaryAttention: prediction.requires_veterinary_attention || false
-    };
+      // Try to extract JSON from the response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsedData = JSON.parse(jsonMatch[0]);
+
+        return {
+          diagnosis: this.mapDiagnosis(parsedData.diagnosis || 'unknown'),
+          confidence: parsedData.confidence || 0,
+          affectedAreas: parsedData.affected_areas || [],
+          recommendations: parsedData.recommendations || [],
+          severity: this.mapSeverity(parsedData.severity),
+          requiresVeterinaryAttention:
+            parsedData.requires_veterinary_attention || false,
+        };
+      }
+
+      // If no JSON found, return mock data
+      console.warn('No JSON found in Gemini response, using mock data');
+      return this.getMockAnalysisResult();
+    } catch (error) {
+      console.error('Failed to parse Gemini response:', error);
+      return this.getMockAnalysisResult();
+    }
   }
 
   /**
@@ -114,13 +165,13 @@ export class AiAnalysisService {
    */
   private mapDiagnosis(diagnosis: string): DiagnosisType {
     const diagnosisMap: Record<string, DiagnosisType> = {
-      'healthy': 'healthy',
-      'laminitis': 'laminitis',
-      'digital_dermatitis': 'digital_dermatitis',
-      'sole_ulcer': 'sole_ulcer',
-      'white_line_disease': 'white_line_disease',
-      'interdigital_dermatitis': 'interdigital_dermatitis',
-      'heel_erosion': 'heel_erosion'
+      healthy: 'healthy',
+      laminitis: 'laminitis',
+      digital_dermatitis: 'digital_dermatitis',
+      sole_ulcer: 'sole_ulcer',
+      white_line_disease: 'white_line_disease',
+      interdigital_dermatitis: 'interdigital_dermatitis',
+      heel_erosion: 'heel_erosion',
     };
 
     return diagnosisMap[diagnosis.toLowerCase()] || 'unknown';
@@ -129,13 +180,16 @@ export class AiAnalysisService {
   /**
    * Map severity string to severity type
    */
-  private mapSeverity(severity?: string): 'none' | 'mild' | 'moderate' | 'severe' {
-    const severityMap: Record<string, 'none' | 'mild' | 'moderate' | 'severe'> = {
-      'none': 'none',
-      'mild': 'mild',
-      'moderate': 'moderate',
-      'severe': 'severe'
-    };
+  private mapSeverity(
+    severity?: string
+  ): 'none' | 'mild' | 'moderate' | 'severe' {
+    const severityMap: Record<string, 'none' | 'mild' | 'moderate' | 'severe'> =
+      {
+        none: 'none',
+        mild: 'mild',
+        moderate: 'moderate',
+        severe: 'severe',
+      };
 
     return severityMap[severity?.toLowerCase() || 'none'] || 'none';
   }
@@ -151,10 +205,10 @@ export class AiAnalysisService {
       recommendations: [
         'Continue regular hoof maintenance',
         'Monitor for any changes in gait or behavior',
-        'Schedule next inspection in 3 months'
+        'Schedule next inspection in 3 months',
       ],
       severity: 'none',
-      requiresVeterinaryAttention: false
+      requiresVeterinaryAttention: false,
     };
   }
 }

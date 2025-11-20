@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AiAnalysisService } from '../../core/services/ai-analysis.service';
+import { ImageTransferService } from '../../core/services/image-transfer.service';
 import { AnalysisResult } from '../../core/models/scan.model';
 
 @Component({
@@ -18,37 +19,47 @@ export class AnalyzingComponent implements OnInit {
 
   constructor(
     private aiAnalysisService: AiAnalysisService,
+    private imageTransferService: ImageTransferService,
     private router: Router
-  ) {
-    // Get the image from navigation state
-    const navigation = this.router.getCurrentNavigation();
-    const state = navigation?.extras.state as { imageBlob: Blob };
+  ) {}
 
-    if (state?.imageBlob) {
+  ngOnInit() {
+    console.log('AnalyzingComponent ngOnInit called');
+
+    // Get the image from transfer service
+    const imageBlob = this.imageTransferService.getImage();
+    console.log('Image blob from service:', imageBlob);
+
+    if (imageBlob) {
+      console.log('Image blob received, size:', imageBlob.size);
+
       // Convert blob to data URL for display
       const reader = new FileReader();
       reader.onload = (e) => {
         this.capturedImage = e.target?.result as string;
+        console.log('Image converted to data URL');
       };
-      reader.readAsDataURL(state.imageBlob);
+      reader.readAsDataURL(imageBlob);
 
       // Start analysis
-      this.analyzeImage(state.imageBlob);
+      this.analyzeImage(imageBlob);
     } else {
+      console.error('No image blob from transfer service');
       this.error = 'No image to analyze';
       this.isAnalyzing = false;
     }
   }
 
-  ngOnInit() {}
-
   async analyzeImage(imageBlob: Blob) {
     try {
+      console.log('Starting analysis...');
       this.isAnalyzing = true;
       this.error = null;
 
       // Call Vertex AI for analysis
+      console.log('Calling AI analysis service...');
       this.analysisResult = await this.aiAnalysisService.analyze(imageBlob);
+      console.log('Analysis complete:', this.analysisResult);
 
       this.isAnalyzing = false;
     } catch (err: any) {
