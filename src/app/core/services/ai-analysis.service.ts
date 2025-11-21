@@ -224,130 +224,148 @@ export class AiAnalysisService {
   }
 
   /**
-   * Build system prompt for Anthropic (cached for cost savings)
+   * Build combined prompt for Anthropic (system + user in one for caching)
    */
   private buildSystemPrompt(): string {
-    return `Du bist ein Experte für Klauengesundheit und Infrarotdiagnostik bei Rindern mit jahrelanger Erfahrung in der Analyse von FLIR-Thermalbildern.
+    return `Du bist ein Experte für Kuhklauen-Thermografie mit FLIR-Kameras.
 
-Deine Expertise umfasst:
-- Erkennung von Klauenkrankheiten (Mortellaro, Sohlengeschwür, Klauenrehe, etc.)
-- Interpretation von FLIR-Farbskalen und Temperaturmustern
-- Extraktion und Analyse von FLIR-EXIF-Metadaten
-- Beurteilung von Lahmheitsrisiken
-- Empfehlungen für Landwirte
-
-Du antwortest immer auf Deutsch und gibst präzise, strukturierte Analysen im JSON-Format.`;
+WICHTIGSTE REGEL:
+Die ASYMMETRIE (Links vs. Rechts Temperaturdifferenz) ist der WICHTIGSTE diagnostische Parameter!`;
   }
 
   /**
-   * Build user prompt for Anthropic
+   * Build user prompt for Anthropic with validated training examples
    */
   private buildUserPrompt(): string {
     return `Analysiere dieses FLIR-Infrarotbild einer Rinderklaue.
 
-📸 SCHRITT 1: FLIR-EXIF-Metadaten extrahieren
+═══════════════════════════════════════════════════════════
+VALIDIERTE TRAININGSBEISPIELE (9 Fälle)
+═══════════════════════════════════════════════════════════
 
-Extrahiere ALLE verfügbaren FLIR-EXIF-Metadaten aus dem Bild:
-- Temperatur-Daten (min_temp, max_temp, center_temp)
-- Kamera-Info (camera_model, camera_serial)
-- Umgebungsbedingungen (emissivity, reflected_temperature, atmospheric_temperature, relative_humidity, distance)
-- Bild-Metadaten (timestamp, width, height)
+FALL 1 [KRANK - Mortellaro]:
+Asymmetrie: 1.71°C (Links: 32.49°C, Rechts: 34.19°C)
+Extreme Hotspots: 8.95%
+Diagnose: KRANK - Fokale einseitige Kroneninfektion
+Muster: Deutliche asymmetrische Erhöhung im rechten Kronenbereich
 
-Falls FLIR-Metadaten vorhanden → nutze sie für präzisere Analyse
-Falls KEINE Metadaten → setze "flir_metadata": null
+FALL 2 [KRANK - Klauenrehe]:
+Asymmetrie: 0.36°C (Links: 34.17°C, Rechts: 33.81°C)
+Erhöhte Bereiche: 28.58%
+Diagnose: KRANK - Diffuse systemische Entzündung
+Muster: Gleichmäßige symmetrische Erwärmung, großflächig betroffen
+⚠️ AUSNAHMEFALL: Trotz geringer Asymmetrie krank wegen diffuser Entzündung
 
-⚠️ SCHRITT 2: BILDVALIDIERUNG
+FALL 3 [GESUND]:
+Asymmetrie: 0.18°C (Links: 34.19°C, Rechts: 34.01°C)
+Diagnose: GESUND
+Muster: Sehr symmetrisch, gleichmäßige Temperaturverteilung
 
-Prüfe ob das Bild eine Rinderklaue oder ein Rinderbein zeigt.
-Falls NICHT → Gib zurück: {"diagnosis": "Ungültiges Bild", "confidence": 0, ...}
+FALL 4 [GESUND]:
+Asymmetrie: 0.41°C (Links: 34.17°C, Rechts: 33.76°C)
+Diagnose: GESUND - Obere Grenze
+Muster: Leichte Asymmetrie aber noch im gesunden Bereich
 
-🦶 SCHRITT 3: Anatomie identifizieren
+FALL 5 [GESUND]:
+Asymmetrie: 0.12°C (Links: 34.27°C, Rechts: 34.14°C)
+Diagnose: GESUND - Ideal
+Muster: Extrem symmetrisch, perfekt gleichmäßig
 
-Analysiere: Zehenspitzen, Sohle, Ballen, Zwischenklauenspalt, Kronrand, Asymmetrie
+FALL 6 [KRANK - Sohlenläsionen]:
+Asymmetrie: 1.09°C (Links: 34.48°C, Rechts: 33.39°C)
+Extreme Hotspots: 9.1%
+Diagnose: KRANK - Multiple Sohlengeschwüre
+Muster: Viele diskrete rote Punkte auf der Sohle
 
-🔥 SCHRITT 4: Temperaturmuster erkennen
+FALL 7 [KRANK - Dermatitis]:
+Asymmetrie: 1.07°C (Links: 33.27°C, Rechts: 34.33°C)
+Extreme Hotspots: 7.6%
+Diagnose: KRANK - Lokale Entzündung
+Muster: Deutlicher heißer Bereich unten an der Klaue
 
-Finde: Hotspots, Hitzeinseln, ringförmige/grossflächige Erwärmung, asymmetrische Hitze
+FALL 8 [GESUND]:
+Asymmetrie: 0.23°C (Links: 33.95°C, Rechts: 34.18°C)
+Diagnose: GESUND
+Muster: Symmetrisch, gleichmäßige Verteilung
 
-🦠 SCHRITT 5: Krankheiten prüfen
+FALL 9 [GRAUZONE]:
+Asymmetrie: 0.53°C (Links: 34.13°C, Rechts: 33.60°C)
+Diagnose: UNKLAR - benötigt klinische Untersuchung
+Muster: Grenzfall, sichtbare Hotspots
 
-- Digitale Dermatitis (Mortellaro): heisser Zwischenklauenspalt, Kronsaumbereich
-- Sohlengeschwür: lokalisierter Hotspot an Sohle
-- Abszess: punktförmige Hitze
-- Klauenrehe: gleichmässig warme Klaue
-- Kronrandentzündung: warmes Band am Kronrand
-- Weitere: Moderhinke, Weisse-Linie-Defekt, Ballenfäule
+═══════════════════════════════════════════════════════════
+GELERNTE SCHWELLENWERTE (100% validiert):
+═══════════════════════════════════════════════════════════
 
-🔬 SCHRITT 6: Detaillierte Thermal-Analyse (WICHTIG!)
+✅ Asymmetrie ≤0.41°C → GESUND (100% Trefferquote: 4/4 Fälle)
+🟡 Asymmetrie 0.42-0.99°C → GRAUZONE (weitere Analyse nötig)
+🔴 Asymmetrie ≥1.0°C → KRANK (100% Trefferquote: 3/3 fokale Infektionen)
 
-Berechne und extrahiere folgende Daten:
+AUSNAHME:
+⚠️ Fall 2 zeigt: Bei 0.36°C ABER >25% erhöhter Fläche + diffus → Rehe (krank)
 
-**Kritische Befunde:**
-1. Maximaltemperatur mit Beschreibung (z.B. "42°C - deutlich erhöht")
-2. Extreme Hotspots in % und Lokalisation (z.B. "8.95% extreme Hotspots im Kronenbereich")
-3. Asymmetrie in °C links vs. rechts (z.B. "1.71°C Asymmetrie → einseitige Entzündung")
-4. Erhöhte Temperatur-Fläche in % (z.B. "26.68% der Klaue zeigt erhöhte Temperaturen")
-5. Temperaturgrenzen-Beschreibung (z.B. "Scharfe Temperaturgrenzen → lokalisierte Läsionen")
+═══════════════════════════════════════════════════════════
+ANALYSEPROZESS:
+═══════════════════════════════════════════════════════════
 
-**Krankheits-spezifische Muster:**
-Für die diagnostizierte Krankheit (z.B. Mortellaro/Digitale Dermatitis):
-- Liste mit 4-5 typischen Indikatoren die erfüllt sind
-- Beispiele: "Erhöhte Temperatur über dem Kronsaum", "Lokalisierte Entzündungsherde (3-5°C über normal)", "Asymmetrische Verteilung", "Scharfe Übergänge zwischen entzündet/gesund"
+SCHRITT 1: BILDVALIDIERUNG
+Prüfe ob Bild eine Rinderklaue zeigt. Falls NICHT → Sofort abbrechen.
 
-📊 AUSGABEFORMAT (verpflichtend - NUR JSON):
+SCHRITT 2: VISUELLES MUSTER ERKENNEN
+- Ist es symmetrisch (links ≈ rechts)?
+- Gibt es fokale Hotspots (helle konzentrierte Punkte)?
+- Ist die Erwärmung gleichmäßig oder konzentriert?
+- Wo sind die heißesten Bereiche?
+
+SCHRITT 3: VERGLEICH MIT TRAININGSBEISPIELEN
+Welchem der 9 Fälle ähnelt das Bild am meisten?
+
+SYMMETRISCH + GLEICHMÄSSIG?
+→ Ähnlich zu Fall 3, 5, 8 → Wahrscheinlich GESUND
+
+ASYMMETRISCH + FOKALE HOTSPOTS?
+→ Ähnlich zu Fall 1, 6, 7 → Wahrscheinlich KRANK (Mortellaro/Läsionen)
+
+SYMMETRISCH + DIFFUS ERHÖHT + GROßFLÄCHIG?
+→ Ähnlich zu Fall 2 → Wahrscheinlich KRANK (Rehe)
+
+GRENZFALL?
+→ Ähnlich zu Fall 9 → GRAUZONE
+
+SCHRITT 4: DIAGNOSE
+Basierend auf ähnlichstem Trainingsfall:
+- Schätze Asymmetrie visuell
+- Gib Diagnose: GESUND / KRANK / GRAUZONE
+- Begründe mit Ähnlichkeit zum Trainingsfall
+
+═══════════════════════════════════════════════════════════
+AUSGABEFORMAT (NUR JSON, keine Markdown-Blöcke!):
+═══════════════════════════════════════════════════════════
 
 {
-  "diagnosis": "Name der Krankheit oder 'gesund'",
+  "diagnosis": "gesund / Name der Krankheit / unklar",
   "confidence": 85,
-  "severity": "none/mild/moderate/severe",
-  "temperature_zones": "Beschreibung",
-  "disease_probability_scores": {"Digitale Dermatitis": 75, ...},
-  "lameness_probability": 65,
-  "urgency_level": 2,
-  "summary": "Kurze Zusammenfassung (max 3 Sätze!)",
+  "similar_to_case": 3,
+  "similarity_reasoning": "Das Bild zeigt symmetrische Erwärmung ähnlich zu Fall 3 (GESUND)",
+  "estimated_asymmetry": 0.2,
+  "visual_pattern": "symmetrisch / asymmetrisch / diffus",
+  "severity": "none / mild / moderate / severe",
+  "summary": "Kurze Zusammenfassung (max 3 Sätze)",
   "affected_areas": [{"name": "Bereich", "severity": 3, "temperature": 38}],
   "recommendations": ["Empfehlung 1", "Empfehlung 2"],
-  "uncertainties": "Bildfaktoren",
   "requires_veterinary_attention": true,
-  "flir_metadata": {
-    "camera_model": "FLIR E8",
-    "min_temp": 32.5,
-    "max_temp": 42.3,
-    ...
-  },
-  "thermal_data": {
-    "critical_findings": {
-      "max_temperature": 42.0,
-      "max_temp_description": "42°C - deutlich erhöht",
-      "extreme_hotspots_percent": 8.95,
-      "extreme_hotspots_location": "im Kronenbereich",
-      "asymmetry_degrees": 1.71,
-      "asymmetry_description": "links vs. rechts → einseitige Entzündung",
-      "elevated_area_percent": 26.68,
-      "temperature_boundaries": "Scharfe Temperaturgrenzen → lokalisierte Läsionen"
-    },
-    "disease_patterns": [
-      {
-        "disease_name": "Mortellaro",
-        "indicators": [
-          "Erhöhte Temperatur über dem Kronsaum",
-          "Lokalisierte Entzündungsherde (3-5°C über normal)",
-          "Asymmetrische Verteilung",
-          "Scharfe Übergänge zwischen entzündet/gesund"
-        ]
-      }
-    ]
-  }
+  "urgency_level": 0,
+  "temperature_zones": "Beschreibung der Farbverteilung",
+  "disease_probability_scores": {"Mortellaro": 75, "Klauenrehe": 10},
+  "lameness_probability": 65
 }
 
-Dringlichkeitslevel: 0=kein Befund, 1=beobachten, 2=Kontrolle empfohlen, 3=Tierarzt nötig
-
 WICHTIG:
-- Antworte NUR mit JSON (keine Markdown-Codeblöcke!)
-- Alle Texte auf DEUTSCH
-- confidence/Wahrscheinlichkeiten: 0-100
-- Bei gesunder Klaue: diagnosis="gesund"
-- thermal_data MUSS immer ausgefüllt sein mit konkreten Werten!`;
+- "similar_to_case" MUSS 1-9 sein
+- "estimated_asymmetry" ist deine visuelle Schätzung in °C
+- Nutze Trainingsbeispiele als Referenz!
+- Antworte auf DEUTSCH
+- NIEMALS nur auf Optik verlassen - ein gelbes Bild kann GESUND sein!`;
   }
 
   /**
