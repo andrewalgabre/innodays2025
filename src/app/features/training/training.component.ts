@@ -56,12 +56,13 @@ export class TrainingComponent implements OnInit {
 
   diagnosisTypes: DiagnosisType[] = [
     { value: 'healthy', label: 'Gesund', icon: 'pi pi-check-circle' },
-    { value: 'laminitis', label: 'Klauenrehe', icon: 'pi pi-exclamation-triangle' },
-    { value: 'digital_dermatitis', label: 'Digitale Dermatitis', icon: 'pi pi-exclamation-circle' },
-    { value: 'sole_ulcer', label: 'Sohlengeschwür', icon: 'pi pi-times-circle' },
-    { value: 'white_line_disease', label: 'Weiße-Linie-Krankheit', icon: 'pi pi-ban' },
-    { value: 'interdigital_dermatitis', label: 'Zwischenklauendermatitis', icon: 'pi pi-exclamation-triangle' },
-    { value: 'heel_erosion', label: 'Ballenfäule', icon: 'pi pi-exclamation-circle' }
+    // { value: 'laminitis', label: 'Klauenrehe', icon: 'pi pi-exclamation-triangle' },
+    // { value: 'digital_dermatitis', label: 'Digitale Dermatitis', icon: 'pi pi-exclamation-circle' },
+    // { value: 'sole_ulcer', label: 'Sohlengeschwür', icon: 'pi pi-times-circle' },
+    // { value: 'white_line_disease', label: 'Weiße-Linie-Krankheit', icon: 'pi pi-ban' },
+    // { value: 'interdigital_dermatitis', label: 'Zwischenklauendermatitis', icon: 'pi pi-exclamation-triangle' },
+    // { value: 'heel_erosion', label: 'Ballenfäule', icon: 'pi pi-exclamation-circle' },
+    { value: 'sick', label: 'Krank', icon: 'pi pi-exclamation-circle' }
   ];
 
   trainingStats: TrainingStats = {
