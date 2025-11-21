@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { AnalysisStorageService } from '../../core/services/analysis-storage.service';
@@ -7,7 +7,7 @@ import { SavedAnalysis } from '../../core/models/saved-analysis.model';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })

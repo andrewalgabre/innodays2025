@@ -98,28 +98,21 @@
 
   <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <button class="nav-item active">
+    <a routerLink="/home" routerLinkActive="active" class="nav-item">
       <lucide-icon name="home"></lucide-icon>
       <span>Start</span>
-    </button>
-    <button class="nav-item">
+    </a>
+    <a routerLink="/history" routerLinkActive="active" class="nav-item">
       <lucide-icon name="history"></lucide-icon>
       <span>Verlauf</span>
-    </button>
-    <a
-      routerLink="/training"
-      routerLinkActive="active"
-      class="nav-item">
+    </a>
+    <a routerLink="/training" routerLinkActive="active" class="nav-item">
       <lucide-icon name="bar-chart-3"></lucide-icon>
       <span>Training</span>
     </a>
-<!--    <button class="nav-item">-->
-<!--      <lucide-icon name="bar-chart-3"></lucide-icon>-->
-<!--      <span>Training</span>-->
-<!--    </button>-->
-    <button class="nav-item">
+    <a routerLink="/settings" routerLinkActive="active" class="nav-item">
       <lucide-icon name="settings"></lucide-icon>
       <span>Einstellungen</span>
-    </button>
+    </a>
   </nav>
 </div>

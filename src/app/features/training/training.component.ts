@@ -1,8 +1,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { LucideAngularModule } from 'lucide-angular';
 import { GcsUploadService } from '../../core/services/gs-upload.service';
 
 interface SelectedFile {
@@ -35,8 +37,10 @@ interface DiagnosisDistribution {
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     ButtonModule,
-    ProgressBarModule
+    ProgressBarModule,
+    LucideAngularModule
   ],
   templateUrl: './training.component.html',
   styleUrls: ['./training.component.css']
