@@ -4,104 +4,212 @@
     <button class="btn-icon-header" (click)="goHome()">
       <lucide-icon name="arrow-left"></lucide-icon>
     </button>
-    <h1 class="app-title">Scan-Ergebnisse</h1>
+    <h1 class="app-title">Analyseergebnis</h1>
     <div class="placeholder"></div>
   </header>
 
   <!-- Main Content -->
   <main class="results-main">
-    <!-- Captured Image -->
-    <div class="image-container" *ngIf="capturedImage">
-      <img [src]="capturedImage" alt="Aufgenommenes Klauenbild">
+    <!-- Captured Image Preview -->
+    <div class="image-preview" *ngIf="capturedImage">
+      <img [src]="capturedImage" alt="Aufgenommenes Klauenbild" />
     </div>
 
-    <!-- Diagnosis Card -->
-    <div class="result-card diagnosis-card">
-      <div class="card-header">
-        <div class="icon-badge" [class.success]="analysisResult.diagnosis === 'gesund'"
-             [class.warning]="analysisResult.diagnosis !== 'gesund'">
-          <lucide-icon name="check-circle-2" *ngIf="analysisResult.diagnosis === 'gesund'"></lucide-icon>
-          <lucide-icon name="alert-triangle" *ngIf="analysisResult.diagnosis !== 'gesund'"></lucide-icon>
-        </div>
-        <div>
-          <h2>{{ analysisResult.diagnosis | titlecase }}</h2>
-          <p class="confidence">{{ (analysisResult.confidence * 100).toFixed(0) }}% Konfidenz</p>
-        </div>
+    <!-- Results Preview -->
+    <div class="results-preview">
+      <div class="result-badge" [class.warning]="analysisResult.diagnosis !== 'gesund'">
+        <span class="badge-text">{{ analysisResult.diagnosis !== 'gesund' ? 'Befund erkannt' : 'Keine Auffälligkeiten' }}</span>
       </div>
-      <p class="diagnosis-summary" *ngIf="analysisResult.summary">
+
+      <h2>Analyse</h2>
+
+      <!-- Summary Text -->
+      <p class="summary-text" *ngIf="analysisResult.summary">
         {{ analysisResult.summary }}
       </p>
-    </div>
 
-    <!-- Severity Card -->
-    <div class="result-card">
-      <div class="card-title">
-        <lucide-icon name="bar-chart-3"></lucide-icon>
-        <h3>Schweregrad</h3>
-      </div>
-      <div class="severity-indicator">
-        <div class="severity-bar">
-          <div class="severity-fill" [class]="'severity-' + analysisResult.severity"
-               [style.width]="getSeverityWidth()"></div>
+      <div class="result-summary">
+        <div class="result-item">
+          <span class="label">Diagnose</span>
+          <span class="value diagnosis">{{
+            analysisResult.diagnosis | titlecase
+          }}</span>
         </div>
-        <span class="severity-label" [class]="'severity-' + analysisResult.severity">
-          {{ analysisResult.severity | titlecase }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Affected Areas -->
-    <div class="result-card" *ngIf="analysisResult.affectedAreas.length > 0">
-      <div class="card-title">
-        <lucide-icon name="map-pin"></lucide-icon>
-        <h3>Betroffene Bereiche</h3>
-      </div>
-      <div class="areas-list">
-        <div class="area-item" *ngFor="let area of analysisResult.affectedAreas">
-          <div class="area-info">
-            <span class="area-name">{{ area.name }}</span>
-            <span class="area-temp">{{ area.temperature }}°C</span>
+        <div class="result-item">
+          <span class="label">Konfidenz</span>
+          <span class="value"
+            >{{ (analysisResult.confidence * 100).toFixed(0) }}%</span
+          >
+        </div>
+        <div class="result-item">
+          <span class="label">Schweregrad</span>
+          <div class="severity-indicator">
+            <span class="severity-circle" [class]="'severity-' + analysisResult.severity"></span>
+            <span class="value">{{ getSeverityLabel(analysisResult.severity) }}</span>
           </div>
-          <div class="area-severity">
-            <div class="severity-dots">
-              <span class="dot" *ngFor="let i of [1,2,3,4,5]"
-                    [class.active]="i <= area.severity"></span>
+        </div>
+        <div class="result-item" *ngIf="analysisResult.urgencyLevel !== undefined">
+          <span class="label">Dringlichkeit</span>
+          <span class="value" [class]="'urgency-' + analysisResult.urgencyLevel">
+            {{ analysisResult.urgencyLevel }}
+          </span>
+        </div>
+        <div class="result-item" *ngIf="analysisResult.lamenessProbability !== undefined">
+          <span class="label">Lahmheitsrisiko</span>
+          <span class="value">{{ analysisResult.lamenessProbability }}%</span>
+        </div>
+      </div>
+
+      <!-- Affected Areas -->
+      <div class="info-section accordion-section" *ngIf="analysisResult.affectedAreas && analysisResult.affectedAreas.length > 0">
+        <h3 class="accordion-header" (click)="toggleSection('affectedAreas')">
+          <span>Betroffene Bereiche</span>
+          <lucide-icon [name]="showAffectedAreas ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showAffectedAreas">
+          <div class="affected-areas-list">
+            <div class="affected-area-item" *ngFor="let area of analysisResult.affectedAreas">
+              <div class="area-header">
+                <span class="area-name">{{ area.name }}</span>
+                <div class="area-severity-indicator">
+                  <span class="severity-circle-area" [class]="'severity-level-' + area.severity"></span>
+                </div>
+              </div>
+              <div class="area-temp" *ngIf="area.temperature">
+                <span>Temperatur: {{ area.temperature }}°C</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recommendations -->
-    <div class="result-card" *ngIf="analysisResult.recommendations.length > 0">
-      <div class="card-title">
-        <lucide-icon name="lightbulb"></lucide-icon>
-        <h3>Empfehlungen</h3>
+      <!-- Recommendations -->
+      <div class="info-section accordion-section" *ngIf="analysisResult.recommendations.length > 0">
+        <h3 class="accordion-header" (click)="toggleSection('recommendations')">
+          <span>Empfehlungen</span>
+          <lucide-icon [name]="showRecommendations ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showRecommendations">
+          <ul class="recommendations-list">
+            <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
+          </ul>
+        </div>
       </div>
-      <ul class="recommendations-list">
-        <li *ngFor="let rec of analysisResult.recommendations">{{ rec }}</li>
-      </ul>
-    </div>
 
-    <!-- Veterinary Alert -->
-    <div class="alert-card" *ngIf="analysisResult.requiresVeterinaryAttention">
-      <lucide-icon name="alert-circle"></lucide-icon>
-      <div>
-        <h4>Tierärztliche Behandlung erforderlich</h4>
-        <p>Dieser Zustand erfordert eine professionelle tierärztliche Untersuchung.</p>
+      <!-- FLIR Metadata -->
+      <div class="info-section accordion-section" *ngIf="analysisResult.flirMetadata && hasFlirData(analysisResult.flirMetadata)">
+        <h3 class="accordion-header" (click)="toggleSection('flirMetadata')">
+          <span>FLIR-Metadaten</span>
+          <lucide-icon [name]="showFlirMetadata ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showFlirMetadata">
+        <div class="metadata-grid">
+          <div class="metadata-item" *ngIf="analysisResult.flirMetadata.cameraModel">
+            <span class="label">Kameramodell</span>
+            <span class="value">{{ analysisResult.flirMetadata.cameraModel }}</span>
+          </div>
+          <div class="metadata-item" *ngIf="analysisResult.flirMetadata.minTemp !== undefined && analysisResult.flirMetadata.maxTemp !== undefined">
+            <span class="label">Temperaturbereich</span>
+            <span class="value">{{ analysisResult.flirMetadata.minTemp.toFixed(1) }}°C - {{ analysisResult.flirMetadata.maxTemp.toFixed(1) }}°C</span>
+          </div>
+          <div class="metadata-item" *ngIf="analysisResult.flirMetadata.centerTemp !== undefined">
+            <span class="label">Zentrumstemperatur</span>
+            <span class="value">{{ analysisResult.flirMetadata.centerTemp.toFixed(1) }}°C</span>
+          </div>
+          <div class="metadata-item" *ngIf="analysisResult.flirMetadata.emissivity !== undefined">
+            <span class="label">Emissionsgrad</span>
+            <span class="value">{{ analysisResult.flirMetadata.emissivity }}</span>
+          </div>
+          <div class="metadata-item" *ngIf="analysisResult.flirMetadata.relativeHumidity !== undefined">
+            <span class="label">Luftfeuchtigkeit</span>
+            <span class="value">{{ analysisResult.flirMetadata.relativeHumidity }}%</span>
+          </div>
+          <div class="metadata-item" *ngIf="analysisResult.flirMetadata.distance !== undefined">
+            <span class="label">Messabstand</span>
+            <span class="value">{{ analysisResult.flirMetadata.distance }}m</span>
+          </div>
+        </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="actions">
-      <button class="btn btn-secondary" (click)="goToHistory()">
-        <lucide-icon name="history"></lucide-icon>
-        Verlauf anzeigen
-      </button>
-      <button class="btn btn-primary" (click)="newScan()">
-        <lucide-icon name="camera"></lucide-icon>
-        Neuer Scan
-      </button>
+      <!-- Kritische Befunde -->
+      <div class="info-section accordion-section critical-findings" *ngIf="analysisResult.thermalData?.criticalFindings">
+        <h3 class="accordion-header" (click)="toggleSection('criticalFindings')">
+          <span>Kritische Befunde</span>
+          <lucide-icon [name]="showCriticalFindings ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showCriticalFindings">
+        <ul class="findings-list">
+          <li *ngIf="analysisResult.thermalData?.criticalFindings?.maxTempDescription">{{ analysisResult.thermalData?.criticalFindings?.maxTempDescription }}</li>
+          <li *ngIf="analysisResult.thermalData?.criticalFindings?.extremeHotspotsPercent !== undefined">{{ analysisResult.thermalData?.criticalFindings?.extremeHotspotsPercent }}% extreme Hotspots {{ analysisResult.thermalData?.criticalFindings?.extremeHotspotsLocation }}</li>
+          <li *ngIf="analysisResult.thermalData?.criticalFindings?.asymmetryDegrees !== undefined">{{ analysisResult.thermalData?.criticalFindings?.asymmetryDegrees }}°C {{ analysisResult.thermalData?.criticalFindings?.asymmetryDescription }}</li>
+          <li *ngIf="analysisResult.thermalData?.criticalFindings?.elevatedAreaPercent !== undefined">{{ analysisResult.thermalData?.criticalFindings?.elevatedAreaPercent }}% der Klaue zeigt erhöhte Temperaturen</li>
+          <li *ngIf="analysisResult.thermalData?.criticalFindings?.temperatureBoundaries">{{ analysisResult.thermalData?.criticalFindings?.temperatureBoundaries }}</li>
+        </ul>
+        </div>
+      </div>
+
+      <!-- Typisch für [Krankheit] -->
+      <div class="info-section accordion-section disease-patterns" *ngIf="analysisResult.thermalData?.diseasePatterns && (analysisResult.thermalData?.diseasePatterns?.length || 0) > 0">
+        <h3 class="accordion-header" (click)="toggleSection('diseasePatterns')">
+          <span>Typisch für {{ analysisResult.thermalData?.diseasePatterns![0]?.diseaseName }}</span>
+          <lucide-icon [name]="showDiseasePatterns ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showDiseasePatterns">
+        <ul class="pattern-list">
+          <li *ngFor="let indicator of analysisResult.thermalData?.diseasePatterns![0]?.indicators">{{ indicator }}</li>
+        </ul>
+        </div>
+      </div>
+
+      <!-- Temperature Zones -->
+      <div class="info-section accordion-section" *ngIf="analysisResult.temperatureZones">
+        <h3 class="accordion-header" (click)="toggleSection('temperatureZones')">
+          <span>Temperaturzonen</span>
+          <lucide-icon [name]="showTemperatureZones ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showTemperatureZones">
+        <p class="info-text">{{ analysisResult.temperatureZones }}</p>
+        </div>
+      </div>
+
+      <!-- Disease Probability Scores -->
+      <div class="info-section accordion-section" *ngIf="analysisResult.diseaseProbabilityScores && Object.keys(analysisResult.diseaseProbabilityScores).length > 0">
+        <h3 class="accordion-header" (click)="toggleSection('probabilityScores')">
+          <span>Wahrscheinlichkeiten</span>
+          <lucide-icon [name]="showProbabilityScores ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showProbabilityScores">
+        <div class="probability-list">
+          <div class="probability-item" *ngFor="let disease of Object.keys(analysisResult.diseaseProbabilityScores)">
+            <span class="disease-name">{{ disease }}</span>
+            <span class="probability-value">{{ analysisResult.diseaseProbabilityScores[disease] }}%</span>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Uncertainties -->
+      <div class="info-section accordion-section uncertainties" *ngIf="analysisResult.uncertainties">
+        <h3 class="accordion-header" (click)="toggleSection('uncertainties')">
+          <span>Einschränkungen</span>
+          <lucide-icon [name]="showUncertainties ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showUncertainties">
+        <p class="info-text">{{ analysisResult.uncertainties }}</p>
+        </div>
+      </div>
+
+      <div class="feedback-buttons">
+        <button class="btn btn-feedback btn-thumbs-up" (click)="sendFeedback('up')">
+          <lucide-icon name="thumbs-up"></lucide-icon>
+          <span>Hilfreich</span>
+        </button>
+        <button class="btn btn-feedback btn-thumbs-down" (click)="sendFeedback('down')">
+          <lucide-icon name="thumbs-down"></lucide-icon>
+          <span>Nicht hilfreich</span>
+        </button>
+      </div>
     </div>
   </main>
 </div>

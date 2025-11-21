@@ -14,7 +14,18 @@ export class ResultsComponent implements OnInit {
   analysisResult: AnalysisResult | null = null;
   capturedImage: string | null = null;
 
-  // Lucide icons
+  // Accordion state
+  showCriticalFindings = true;
+  showDiseasePatterns = true;
+  showAffectedAreas = false;
+  showRecommendations = false;
+  showFlirMetadata = false;
+  showTemperatureZones = false;
+  showProbabilityScores = false;
+  showUncertainties = false;
+
+  // Expose Object for template
+  Object = Object;
 
   constructor(private router: Router) {
     const navigation = this.router.getCurrentNavigation();
@@ -55,5 +66,53 @@ export class ResultsComponent implements OnInit {
       'severe': 100
     };
     return `${severityMap[this.analysisResult?.severity || 'none']}%`;
+  }
+
+  getSeverityLabel(severity: string): string {
+    const labels: { [key: string]: string } = {
+      'none': 'Keine',
+      'mild': 'Leicht',
+      'moderate': 'Mittel',
+      'severe': 'Schwer'
+    };
+    return labels[severity] || severity;
+  }
+
+  toggleSection(section: string) {
+    switch (section) {
+      case 'criticalFindings':
+        this.showCriticalFindings = !this.showCriticalFindings;
+        break;
+      case 'diseasePatterns':
+        this.showDiseasePatterns = !this.showDiseasePatterns;
+        break;
+      case 'affectedAreas':
+        this.showAffectedAreas = !this.showAffectedAreas;
+        break;
+      case 'recommendations':
+        this.showRecommendations = !this.showRecommendations;
+        break;
+      case 'flirMetadata':
+        this.showFlirMetadata = !this.showFlirMetadata;
+        break;
+      case 'temperatureZones':
+        this.showTemperatureZones = !this.showTemperatureZones;
+        break;
+      case 'probabilityScores':
+        this.showProbabilityScores = !this.showProbabilityScores;
+        break;
+      case 'uncertainties':
+        this.showUncertainties = !this.showUncertainties;
+        break;
+    }
+  }
+
+  hasFlirData(metadata: any): boolean {
+    return metadata && Object.keys(metadata).length > 0;
+  }
+
+  sendFeedback(type: 'up' | 'down') {
+    console.log('Feedback:', type, 'for analysis:', this.analysisResult?.diagnosis);
+    alert(`Vielen Dank für dein Feedback! (${type === 'up' ? '👍' : '👎'})`);
   }
 }

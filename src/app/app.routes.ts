@@ -15,7 +15,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/analyzing/analyzing.component').then(m => m.AnalyzingComponent)
   },
   {
-    path: 'results/:scanId',
+    path: 'results',
     loadComponent: () => import('./features/results/results.component').then(m => m.ResultsComponent)
   },
   {
