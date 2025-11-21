@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { AnalysisResult } from '../models/scan.model';
 import { ThermalData } from '../models/thermal.model';
-import { SettingsService } from './settings.service';
-import { environment } from '../../../environments/environment';
 import { SecretUtil } from '../utils/secret.util';
+import { SettingsService } from './settings.service';
 
 interface VertexAIResponse {
   predictions: Array<{
@@ -33,7 +33,9 @@ export class AiAnalysisService {
   private readonly location = environment.geminiLocation;
 
   // Anthropic configuration - decoded at runtime
-  private readonly anthropicApiKey = SecretUtil.decode(environment.anthropicApiKey);
+  private readonly anthropicApiKey = SecretUtil.decode(
+    environment.anthropicApiKey
+  );
   private readonly anthropicModel = 'claude-sonnet-4-5-20250929';
   private readonly anthropicVersion = '2023-06-01';
 
@@ -111,6 +113,11 @@ export class AiAnalysisService {
           },
         ],
       };
+
+      console.log('Anthropic API key:', this.anthropicApiKey);
+      console.log('Gemini API key:', this.geminiApiKey);
+      console.log('Project ID:', this.projectId);
+      console.log('Location:', this.location);
 
       const headers = {
         'x-api-key': this.anthropicApiKey,
