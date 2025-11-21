@@ -29,7 +29,7 @@ jobs:
             geminiApiKey: '${{ secrets.GEMINI_API_KEY }}',
             geminiProjectId: '${{ secrets.GEMINI_PROJECT_ID }}',
             geminiLocation: 'us-central1'
-          };" > src/environments/environment.ts
+          };" > src/environments/environment.prod.ts
 
       - name: Build
         run: npm run build
