@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { AnalysisResult } from '../models/scan.model';
 import { ThermalData } from '../models/thermal.model';
 import { SettingsService } from './settings.service';
+import { environment } from '../../../environments/environment';
 
 interface VertexAIResponse {
   predictions: Array<{
@@ -26,14 +27,12 @@ interface VertexAIResponse {
 })
 export class AiAnalysisService {
   // Gemini (Vertex AI) configuration
-  private readonly geminiApiKey =
-    'AQ.Ab8RN6JOAbfKoMu-2v7p4fZhJtU8sqeQ0BxIw0tFKYhaZF0eAQ';
-  private readonly projectId = 'prj-bison-3097627891-rindern';
-  private readonly location = 'us-central1';
+  private readonly geminiApiKey = environment.geminiApiKey;
+  private readonly projectId = environment.geminiProjectId;
+  private readonly location = environment.geminiLocation;
 
   // Anthropic configuration
-  private readonly anthropicApiKey =
-    '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'; // TODO: Replace with your API key
+  private readonly anthropicApiKey = environment.anthropicApiKey;
   private readonly anthropicModel = 'claude-sonnet-4-5-20250929';
   private readonly anthropicVersion = '2023-06-01';
 
