@@ -417,25 +417,35 @@
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.severity-circle-area.severity-level-1 {
   background-color: #d1d5db;
 }
 
+.severity-circle-area.severity-level-0 {
+  background-color: #22c55e;
+}
+
+.severity-circle-area.severity-level-1,
 .severity-circle-area.severity-level-2 {
+  background-color: #84cc16;
+}
+
+.severity-circle-area.severity-level-3,
+.severity-circle-area.severity-level-4 {
   background-color: #fbbf24;
 }
 
-.severity-circle-area.severity-level-3 {
+.severity-circle-area.severity-level-5,
+.severity-circle-area.severity-level-6 {
   background-color: #fb923c;
 }
 
-.severity-circle-area.severity-level-4 {
+.severity-circle-area.severity-level-7,
+.severity-circle-area.severity-level-8 {
   background-color: #f97316;
 }
 
-.severity-circle-area.severity-level-5 {
+.severity-circle-area.severity-level-9,
+.severity-circle-area.severity-level-10 {
   background-color: #dc2626;
 }
 
