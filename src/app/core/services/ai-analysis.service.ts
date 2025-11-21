@@ -52,11 +52,6 @@ export class AiAnalysisService {
     thermalData?: ThermalData
   ): Promise<AnalysisResult> {
     const provider = this.settingsService.getProvider();
-    console.log(
-      'AI Analysis Service - analyze() called with provider:',
-      provider
-    );
-    console.log('Image blob size:', imageBlob.size, 'type:', imageBlob.type);
 
     if (provider === 'anthropic') {
       return await this.analyzeWithAnthropic(imageBlob);
@@ -69,7 +64,6 @@ export class AiAnalysisService {
    * Analyze with Anthropic Claude (supports FLIR metadata extraction)
    */
   private async analyzeWithAnthropic(imageBlob: Blob): Promise<AnalysisResult> {
-    console.log('Using Anthropic Claude Sonnet 4.5...');
 
     try {
       // Convert blob to base64
@@ -114,11 +108,6 @@ export class AiAnalysisService {
         ],
       };
 
-      console.log('Anthropic API key:', this.anthropicApiKey);
-      console.log('Gemini API key:', this.geminiApiKey);
-      console.log('Project ID:', this.projectId);
-      console.log('Location:', this.location);
-
       const headers = {
         'x-api-key': this.anthropicApiKey,
         'anthropic-version': this.anthropicVersion,
@@ -126,16 +115,13 @@ export class AiAnalysisService {
         'anthropic-dangerous-direct-browser-access': 'true',
       };
 
-      console.log('Making HTTP request to Anthropic...');
       const response = await firstValueFrom(
         this.http.post<any>(url, payload, { headers })
       );
-      console.log('Anthropic response received:', response);
 
       // Parse Anthropic response
       return this.parseAnthropicResponse(response);
     } catch (error: any) {
-      console.error('Anthropic analysis error:', error);
 
       // Create user-friendly error message
       let errorMessage = 'Anthropic API Fehler';
@@ -160,7 +146,6 @@ export class AiAnalysisService {
    * Analyze with Google Gemini (visual analysis only)
    */
   private async analyzeWithGemini(imageBlob: Blob): Promise<AnalysisResult> {
-    console.log('Using Google Gemini 2.5 Pro...');
 
     try {
       // Convert blob to base64
@@ -196,15 +181,11 @@ export class AiAnalysisService {
         },
       };
 
-      console.log('Making HTTP request to Gemini...');
       const response = await firstValueFrom(this.http.post<any>(url, payload));
-      console.log('Gemini response received:', response);
 
       // Parse Gemini response
       return this.parseGeminiResponse(response);
     } catch (error: any) {
-      console.error('Gemini analysis error:', error);
-
       // Create user-friendly error message
       let errorMessage = 'Gemini API Fehler';
 
@@ -343,7 +324,7 @@ AUSGABEFORMAT (NUR JSON, keine Markdown-Blöcke!):
 ═══════════════════════════════════════════════════════════
 
 {
-  "diagnosis": "gesund / Name der Krankheit / unklar",
+  "diagnosis": "gesund / Digitale Dermatitis / Klauenrehe / Sohlengeschwür / unklar",
   "confidence": 85,
   "similar_to_case": 3,
   "similarity_reasoning": "Das Bild zeigt symmetrische Erwärmung ähnlich zu Fall 3 (GESUND)",
@@ -361,6 +342,7 @@ AUSGABEFORMAT (NUR JSON, keine Markdown-Blöcke!):
 }
 
 WICHTIG:
+- "diagnosis" NUR Krankheitsname (z.B. "Digitale Dermatitis"), NICHT "krank - Digitale Dermatitis"!
 - "similar_to_case" MUSS 1-9 sein
 - "estimated_asymmetry" ist deine visuelle Schätzung in °C
 - Nutze Trainingsbeispiele als Referenz!
@@ -375,7 +357,6 @@ WICHTIG:
     try {
       // Extract text from Anthropic response
       const text = response.content?.[0]?.text || '';
-      console.log('Anthropic text response:', text);
 
       // Remove markdown code blocks if present
       const cleanedText = text
@@ -386,6 +367,10 @@ WICHTIG:
       const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
+
+        // Clean diagnosis - remove "krank - " prefix if present
+        let diagnosis = parsedData.diagnosis || 'Unbekannt';
+        diagnosis = diagnosis.replace(/^krank\s*-\s*/i, '');
 
         // Normalize confidence to 0-1 range
         let confidence = parsedData.confidence || 0;
@@ -465,7 +450,7 @@ WICHTIG:
           : undefined;
 
         return {
-          diagnosis: parsedData.diagnosis || 'Unbekannt',
+          diagnosis: diagnosis,
           confidence: confidence,
           summary: parsedData.summary || '',
           affectedAreas: parsedData.affected_areas || [],
@@ -484,10 +469,8 @@ WICHTIG:
       }
 
       // If no JSON found, return mock data
-      console.warn('No JSON found in Anthropic response, using mock data');
       return this.getMockAnalysisResult();
     } catch (error) {
-      console.error('Failed to parse Anthropic response:', error);
       return this.getMockAnalysisResult();
     }
   }
@@ -679,7 +662,6 @@ WICHTIG:
     try {
       // Extract text from Gemini response
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      console.log('Gemini text response:', text);
 
       // Remove markdown code blocks if present
       const cleanedText = text
@@ -739,10 +721,8 @@ WICHTIG:
       }
 
       // If no JSON found, return mock data
-      console.warn('No JSON found in Gemini response, using mock data');
       return this.getMockAnalysisResult();
     } catch (error) {
-      console.error('Failed to parse Gemini response:', error);
       return this.getMockAnalysisResult();
     }
   }
