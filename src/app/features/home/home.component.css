@@ -366,8 +366,11 @@
   font-weight: var(--font-weight-medium);
 }
 
-.nav-item i {
-  font-size: 1.25rem;
+.nav-item i,
+.nav-item lucide-icon {
+  font-size: 1.5rem;
+  width: 24px;
+  height: 24px;
 }
 
 .nav-item:hover {
@@ -379,7 +382,7 @@
 }
 
 .nav-item span {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
 }
 
 /* Responsive - Desktop */
