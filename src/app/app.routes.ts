@@ -23,6 +23,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/history/history.component').then(m => m.HistoryComponent)
   },
   {
+    path: 'training',
+    loadComponent: () => import('./features/training/training.component').then(m => m.TrainingComponent)
+  },
+  {
     path: 'cow-profile/:cowId',
     loadComponent: () => import('./features/cow-profile/cow-profile.component').then(m => m.CowProfileComponent)
   },

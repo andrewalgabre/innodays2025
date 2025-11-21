@@ -1,1 +1,36 @@
 <router-outlet></router-outlet>
+
+<nav class="bottom-nav">
+  <button
+    class="nav-item"
+    [class.active]="isActive('/home')"
+    (click)="navigateTo('/home')">
+    <lucide-icon name="home"></lucide-icon>
+    <span>Start</span>
+  </button>
+
+  <button
+    class="nav-item"
+    [class.active]="isActive('/history')"
+    (click)="navigateTo('/history')">
+    <lucide-icon name="history"></lucide-icon>
+    <span>Verlauf</span>
+  </button>
+
+  <button
+    class="nav-item"
+    [class.active]="isActive('/training')"
+    (click)="navigateTo('/training')">
+    <lucide-icon name="bar-chart-3"></lucide-icon>
+    <span>Training</span>
+  </button>
+
+  <button
+    class="nav-item"
+    [class.active]="isActive('/settings')"
+    (click)="navigateTo('/settings')">
+    <lucide-icon name="settings"></lucide-icon>
+    <span>Einstellungen</span>
+  </button>
+</nav>
+

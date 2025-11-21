@@ -1,0 +1,224 @@
+<div class="training-container">
+  <div class="header">
+    <h1>
+      <i class="pi pi-graduation-cap"></i>
+      KI-Training
+    </h1>
+    <p class="subtitle">Laden Sie Trainingsbilder hoch, um die KI-Erkennung zu verbessern</p>
+  </div>
+
+  <div class="content-grid">
+
+    <!-- Upload Card -->
+    <div class="upload-card">
+      <div class="card-header">
+        <h2>
+          <i class="pi pi-cloud-upload"></i>
+          Trainingsdaten hochladen
+        </h2>
+        <span class="info-badge">
+          <i class="pi pi-info-circle"></i>
+          Unterstützt: JPG, PNG, TIFF
+        </span>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Upload Zone -->
+        <div
+          class="upload-zone"
+          [class.dragover]="isDragging"
+          (drop)="onDrop($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)">
+
+          <i class="pi pi-cloud-upload upload-icon"></i>
+          <h3>Bilder hierher ziehen</h3>
+          <p>oder</p>
+          <button
+            pButton
+            label="Dateien auswählen"
+            icon="pi pi-folder-open"
+            class="p-button-outlined"
+            (click)="fileInput.click()">
+          </button>
+          <input
+            #fileInput
+            type="file"
+            multiple
+            accept="image/*"
+            (change)="onFilesSelected($event)"
+            style="display: none;">
+
+          <div class="upload-info">
+            <small>Max. 10 MB pro Datei • Mehrfachauswahl möglich</small>
+          </div>
+        </div>
+
+        <!-- Krankheitstyp Auswahl -->
+        <div class="diagnosis-selection" *ngIf="selectedFiles.length > 0">
+          <h3>Diagnose für diese Bilder:</h3>
+          <div class="diagnosis-options">
+            <div
+              class="diagnosis-option"
+              *ngFor="let diagnosis of diagnosisTypes"
+              [class.selected]="selectedDiagnosis === diagnosis.value"
+              (click)="selectDiagnosis(diagnosis.value)">
+              <i [class]="diagnosis.icon"></i>
+              <span>{{ diagnosis.label }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ausgewählte Dateien -->
+        <div class="selected-files" *ngIf="selectedFiles.length > 0">
+          <div class="files-header">
+            <h3>Ausgewählte Dateien ({{ selectedFiles.length }})</h3>
+            <button
+              pButton
+              label="Alle entfernen"
+              icon="pi pi-times"
+              class="p-button-text p-button-sm p-button-danger"
+              (click)="clearFiles()">
+            </button>
+          </div>
+
+          <div class="files-list">
+            <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+              <img [src]="file.preview" alt="Preview" class="file-preview">
+              <div class="file-info">
+                <span class="file-name">{{ file.file.name }}</span>
+                <span class="file-size">{{ formatFileSize(file.file.size) }}</span>
+              </div>
+              <div class="file-status">
+                <i
+                  *ngIf="file.status === 'ready'"
+                  class="pi pi-clock status-icon ready">
+                </i>
+                <i
+                  *ngIf="file.status === 'uploading'"
+                  class="pi pi-spin pi-spinner status-icon uploading">
+                </i>
+                <i
+                  *ngIf="file.status === 'success'"
+                  class="pi pi-check-circle status-icon success">
+                </i>
+                <i
+                  *ngIf="file.status === 'error'"
+                  class="pi pi-times-circle status-icon error">
+                </i>
+              </div>
+              <button
+                pButton
+                icon="pi pi-times"
+                class="p-button-text p-button-sm p-button-danger"
+                (click)="removeFile(i)"
+                [disabled]="isUploading">
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Button -->
+          <div class="upload-actions" *ngIf="!isUploading && selectedFiles.length > 0">
+            <button
+              pButton
+              label="Zu Google Cloud Storage hochladen"
+              icon="pi pi-upload"
+              class="p-button-lg"
+              [disabled]="!selectedDiagnosis || selectedFiles.length === 0"
+              (click)="uploadFiles()">
+            </button>
+          </div>
+
+          <!-- Upload Progress -->
+          <div class="upload-progress" *ngIf="isUploading">
+            <h3>Upload läuft... ({{ uploadedCount }}/{{ selectedFiles.length }})</h3>
+            <p-progressBar [value]="overallProgress"></p-progressBar>
+            <div class="progress-info">
+              <span>{{ overallProgress.toFixed(1) }}%</span>
+              <span>{{ uploadStatus }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Info/Stats Card -->
+    <div class="info-card">
+      <div class="card-header">
+        <h2>
+          <i class="pi pi-info-circle"></i>
+          Trainingsübersicht
+        </h2>
+      </div>
+
+      <div class="card-body">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <i class="pi pi-images"></i>
+            <div>
+              <span class="stat-value">{{ trainingStats.totalImages }}</span>
+              <span class="stat-label">Trainingsbilder</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <i class="pi pi-database"></i>
+            <div>
+              <span class="stat-value">{{ trainingStats.totalSize }} MB</span>
+              <span class="stat-label">Gesamtgröße</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <i class="pi pi-check-circle"></i>
+            <div>
+              <span class="stat-value">{{ trainingStats.lastUpload || 'Noch keine' }}</span>
+              <span class="stat-label">Letzter Upload</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>
+            <i class="pi pi-lightbulb"></i>
+            Tipps für bessere Trainingsdaten:
+          </h3>
+          <ul>
+            <li>Verwenden Sie qualitativ hochwertige Wärmebildaufnahmen</li>
+            <li>Stellen Sie sicher, dass die Klaue gut sichtbar ist</li>
+            <li>Ordnen Sie jedes Bild der korrekten Diagnose zu</li>
+            <li>Laden Sie verschiedene Perspektiven und Schweregrade hoch</li>
+            <li>Mindestens 50 Bilder pro Krankheitstyp empfohlen</li>
+          </ul>
+        </div>
+
+        <div class="diagnosis-distribution">
+          <h3>Verteilung nach Diagnose:</h3>
+          <div class="distribution-list">
+            <div class="distribution-item" *ngFor="let item of diagnosisDistribution">
+              <span class="diagnosis-name">{{ item.name }}</span>
+              <div class="distribution-bar">
+                <div class="bar-fill" [style.width.%]="item.percentage"></div>
+              </div>
+              <span class="diagnosis-count">{{ item.count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button
+          pButton
+          label="Training starten"
+          icon="pi pi-play"
+          class="p-button-success"
+          [disabled]="trainingStats.totalImages < 10"
+          (click)="startTraining()">
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
