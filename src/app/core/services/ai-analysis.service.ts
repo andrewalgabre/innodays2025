@@ -5,6 +5,7 @@ import { AnalysisResult } from '../models/scan.model';
 import { ThermalData } from '../models/thermal.model';
 import { SettingsService } from './settings.service';
 import { environment } from '../../../environments/environment';
+import { SecretUtil } from '../utils/secret.util';
 
 interface VertexAIResponse {
   predictions: Array<{
@@ -26,13 +27,13 @@ interface VertexAIResponse {
   providedIn: 'root',
 })
 export class AiAnalysisService {
-  // Gemini (Vertex AI) configuration
-  private readonly geminiApiKey = environment.geminiApiKey;
+  // Gemini (Vertex AI) configuration - decoded at runtime
+  private readonly geminiApiKey = SecretUtil.decode(environment.geminiApiKey);
   private readonly projectId = environment.geminiProjectId;
   private readonly location = environment.geminiLocation;
 
-  // Anthropic configuration
-  private readonly anthropicApiKey = environment.anthropicApiKey;
+  // Anthropic configuration - decoded at runtime
+  private readonly anthropicApiKey = SecretUtil.decode(environment.anthropicApiKey);
   private readonly anthropicModel = 'claude-sonnet-4-5-20250929';
   private readonly anthropicVersion = '2023-06-01';
 
