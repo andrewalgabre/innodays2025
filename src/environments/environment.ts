@@ -7,4 +7,8 @@ export const environment = {
     'ENC_=EVQlBjRaFGaZtkR0BzdJhnQwEVZxNHOVRnSoplZ0A3N2JTL110bLZmYB9kS24kU4IWQuEVQ',
   geminiProjectId: 'prj-bison-3097627891-rindern',
   geminiLocation: 'us-central1',
+  gcs: {
+    apiKey: 'your-google-storage-api-key-here',
+    bucketName: 'your-google-storage-bucket-name-here',
+  }
 };

@@ -5,5 +5,9 @@ export const environment = {
   anthropicApiKey: 'your-anthropic-api-key-here',
   geminiApiKey: 'your-gemini-api-key-here',
   geminiProjectId: 'your-gemini-project-id-here',
-  geminiLocation: 'us-central1'
+  geminiLocation: 'us-central1',
+  gcs: {
+    apiKey: 'your-google-storage-api-key-here',
+    bucketName: 'your-google-storage-bucket-name-here',
+  }
 };
