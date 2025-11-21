@@ -26,5 +26,9 @@ export const routes: Routes = [
     path: 'cow-profile/:cowId',
     loadComponent: () => import('./features/cow-profile/cow-profile.component').then(m => m.CowProfileComponent)
   },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
+  },
   { path: '**', redirectTo: '/home' }
 ];

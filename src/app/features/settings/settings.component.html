@@ -1,0 +1,81 @@
+<div class="settings-container">
+  <!-- Header -->
+  <header class="settings-header">
+    <h1 class="settings-title">Einstellungen</h1>
+    <button class="btn-close" (click)="close()">
+      <lucide-icon name="x"></lucide-icon>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="settings-main">
+    <section class="setting-section">
+      <h2 class="section-title">🤖 KI-Provider</h2>
+
+      <div class="provider-options">
+        <!-- Anthropic Option -->
+        <label class="provider-option" [class.selected]="selectedProvider === 'anthropic'">
+          <input
+            type="radio"
+            name="provider"
+            value="anthropic"
+            [(ngModel)]="selectedProvider"
+            (change)="onProviderChange('anthropic')">
+          <div class="provider-content">
+            <div class="provider-header">
+              <div class="provider-name">Anthropic Claude Sonnet 4.5</div>
+              <div class="provider-badge success">FLIR ✓</div>
+            </div>
+            <div class="provider-desc">Empfohlen - Extrahiert FLIR-Metadaten aus dem Bild</div>
+            <ul class="provider-features">
+              <li>✓ FLIR-EXIF-Metadaten Extraktion</li>
+              <li>✓ Temperatur-Daten (Min/Max/Center)</li>
+              <li>✓ Kamera-Info & Umgebungsbedingungen</li>
+              <li>✓ Präzisere Diagnosen</li>
+            </ul>
+          </div>
+        </label>
+
+        <!-- Gemini Option -->
+        <label class="provider-option" [class.selected]="selectedProvider === 'gemini'">
+          <input
+            type="radio"
+            name="provider"
+            value="gemini"
+            [(ngModel)]="selectedProvider"
+            (change)="onProviderChange('gemini')">
+          <div class="provider-content">
+            <div class="provider-header">
+              <div class="provider-name">Google Gemini 2.5 Pro</div>
+              <div class="provider-badge">Visual Only</div>
+            </div>
+            <div class="provider-desc">Schneller - Nur visuelle Analyse ohne Metadaten</div>
+            <ul class="provider-features">
+              <li>✓ Visuelle Analyse</li>
+              <li>✓ Schnellere Response</li>
+              <li>✗ Keine FLIR-Metadaten</li>
+            </ul>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <section class="info-section">
+      <h2 class="section-title">ℹ️ Hinweis</h2>
+      <p class="info-text">
+        Claude kann FLIR-Metadaten (Temperatur, Kamera-Info, Umgebungsbedingungen)
+        direkt aus dem Bild extrahieren und für eine präzisere Diagnose nutzen.
+      </p>
+      <p class="info-text">
+        Gemini analysiert nur visuell ohne Zugriff auf EXIF-Metadaten.
+      </p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <div class="settings-footer">
+    <button class="btn btn-primary" (click)="save()">
+      Speichern
+    </button>
+  </div>
+</div>

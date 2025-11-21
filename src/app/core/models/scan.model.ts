@@ -1,4 +1,4 @@
-import { ThermalData } from './thermal.model';
+import { ThermalData, FLIRMetadata } from './thermal.model';
 
 export interface Scan {
   id: string;
@@ -24,6 +24,8 @@ export interface AnalysisResult {
   lamenessProbability?: number;
   urgencyLevel?: number;
   uncertainties?: string;
+  flirMetadata?: FLIRMetadata;
+  thermalData?: ThermalData;
 }
 
 // Diagnosis is returned in German from AI, so we accept any string

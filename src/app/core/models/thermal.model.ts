@@ -1,3 +1,29 @@
+export interface FLIRMetadata {
+  // Camera info
+  cameraModel?: string;
+  cameraSerial?: string;
+
+  // Temperature data
+  minTemp?: number;
+  maxTemp?: number;
+  centerTemp?: number;
+
+  // Environmental conditions
+  emissivity?: number;
+  reflectedTemperature?: number;
+  atmosphericTemperature?: number;
+  relativeHumidity?: number;
+  distance?: number;
+
+  // Image metadata
+  timestamp?: Date;
+  width?: number;
+  height?: number;
+
+  // Raw thermal matrix (if available)
+  rawThermalData?: number[][];
+}
+
 export interface ThermalData {
   width: number;
   height: number;
@@ -6,6 +32,26 @@ export interface ThermalData {
   minTemp: number;
   maxTemp: number;
   avgTemp: number;
+
+  // Detailed thermal analysis
+  criticalFindings?: CriticalFindings;
+  diseasePatterns?: DiseasePattern[];
+}
+
+export interface CriticalFindings {
+  maxTemperature?: number;
+  maxTempDescription?: string;
+  extremeHotspotsPercent?: number;
+  extremeHotspotsLocation?: string;
+  asymmetryDegrees?: number;
+  asymmetryDescription?: string;
+  elevatedAreaPercent?: number;
+  temperatureBoundaries?: string;
+}
+
+export interface DiseasePattern {
+  diseaseName: string;
+  indicators: string[];
 }
 
 export interface ThermalHotspot {

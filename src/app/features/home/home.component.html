@@ -1,8 +1,11 @@
 <div class="home-container">
   <!-- App Header -->
   <header class="app-header">
-    <h1 class="app-title">{{ appName }}</h1>
-    <button class="btn-icon-header">
+    <div class="app-branding">
+      <img src="logo.png" alt="Logo" class="app-logo">
+      <h1 class="app-title">{{ appName }}</h1>
+    </div>
+    <button class="btn-icon-header" (click)="openSettings()">
       <lucide-icon name="settings"></lucide-icon>
     </button>
   </header>
@@ -35,18 +38,18 @@
             <lucide-icon name="check-circle-2"></lucide-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">0</div>
+            <div class="stat-value">{{ totalScans }}</div>
             <div class="stat-label">Scans insgesamt</div>
           </div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon">
-            <lucide-icon name="users"></lucide-icon>
+            <lucide-icon name="alert-triangle"></lucide-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">0</div>
-            <div class="stat-label">Erfasste Kühe</div>
+            <div class="stat-value">{{ totalFindings }}</div>
+            <div class="stat-label">Befunde</div>
           </div>
         </div>
       </div>
@@ -55,10 +58,40 @@
     <!-- Recent Activity -->
     <div class="recent-section">
       <h3 class="section-label">Letzte Scans</h3>
-      <div class="empty-state">
+
+      <!-- Loading State -->
+      <div class="empty-state" *ngIf="isLoading">
+        <lucide-icon name="loader-2" class="loading-icon"></lucide-icon>
+        <p>Lädt Scans...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && recentScans.length === 0">
         <lucide-icon name="inbox"></lucide-icon>
         <p>Noch keine Scans</p>
         <span>Starten Sie Ihren ersten Scan zur Überwachung</span>
+      </div>
+
+      <!-- Recent Scans List -->
+      <div class="scans-list" *ngIf="!isLoading && recentScans.length > 0">
+        <div class="scan-card" *ngFor="let scan of recentScans" (click)="viewScan(scan)">
+          <div class="scan-image">
+            <img [src]="scan.imageBase64" alt="Scan">
+          </div>
+          <div class="scan-content">
+            <div class="scan-header">
+              <span class="scan-diagnosis">{{ scan.diagnosis }}</span>
+              <span class="scan-time">{{ formatDate(scan.timestamp) }}</span>
+            </div>
+            <div class="scan-severity">
+              <span class="severity-circle" [class]="'severity-' + scan.severity"></span>
+              <span class="severity-label">{{ getSeverityLabel(scan.severity) }}</span>
+            </div>
+          </div>
+          <div class="scan-arrow">
+            <lucide-icon name="arrow-right"></lucide-icon>
+          </div>
+        </div>
       </div>
     </div>
   </main>
