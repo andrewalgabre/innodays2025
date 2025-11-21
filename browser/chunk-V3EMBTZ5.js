@@ -1,0 +1,1 @@
+import{R as a}from"./chunk-NXH6DGID.js";var r=class e{capturedImage=null;setImage(t){this.capturedImage=t}getImage(){let t=this.capturedImage;return this.capturedImage=null,t}static \u0275fac=function(o){return new(o||e)};static \u0275prov=a({token:e,factory:e.\u0275fac,providedIn:"root"})};export{r as a};

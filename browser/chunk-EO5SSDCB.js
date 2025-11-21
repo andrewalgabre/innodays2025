@@ -1,0 +1,1 @@
+import{Ja as o,Ya as n,Za as s,ib as i}from"./chunk-NXH6DGID.js";var r=class e{static \u0275fac=function(t){return new(t||e)};static \u0275cmp=o({type:e,selectors:[["app-history"]],decls:2,vars:0,template:function(t,a){t&1&&(n(0,"p"),i(1,"history works!"),s())},encapsulation:2})};export{r as HistoryComponent};

@@ -1,0 +1,1 @@
+import{Ja as t,Ya as n,Za as i,ib as p}from"./chunk-NXH6DGID.js";var r=class o{static \u0275fac=function(e){return new(e||o)};static \u0275cmp=t({type:o,selectors:[["app-cow-profile"]],decls:2,vars:0,template:function(e,c){e&1&&(n(0,"p"),p(1,"cow-profile works!"),i())},encapsulation:2})};export{r as CowProfileComponent};
