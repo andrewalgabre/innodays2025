@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "export const environment = {
             production: true,
-            anthropicApiKey: '${{ secrets.ANTHROPIC_API_KEY }}',
+            anthropicApiKey: '${{ secrets.ANTHROPIC_API_KEY_1 }}${{ secrets.ANTHROPIC_API_KEY_2 }}${{ secrets.ANTHROPIC_API_KEY_3 }}',
             geminiApiKey: '${{ secrets.GEMINI_API_KEY }}',
             geminiProjectId: '${{ secrets.GEMINI_PROJECT_ID }}',
             geminiLocation: 'us-central1'
