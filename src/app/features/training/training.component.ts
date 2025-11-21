@@ -179,8 +179,10 @@ export class TrainingComponent implements OnInit {
       this.uploadStatus = `Lade ${fileData.file.name} hoch...`;
 
       try {
-        // Upload zu GCS im training-data Ordner
-        const fileName = `training-data/${this.selectedDiagnosis}/${Date.now()}_${fileData.file.name}`;
+        let fileName = `sick/${this.selectedDiagnosis}_${Date.now()}_${fileData.file.name}`;
+        if (this.selectedDiagnosis == 'healthy') {
+          fileName = `healthy/${this.selectedDiagnosis}_${Date.now()}_${fileData.file.name}`;
+        }
 
         const url = await this.gcsUpload.uploadWithProgress(
           fileData.file,
@@ -195,9 +197,6 @@ export class TrainingComponent implements OnInit {
         fileData.status = 'success';
         fileData.url = url;
         this.uploadedCount++;
-
-        console.log(`✅ ${fileData.file.name} hochgeladen:`, url);
-
       } catch (error) {
         console.error(`❌ Fehler beim Upload von ${fileData.file.name}:`, error);
         fileData.status = 'error';

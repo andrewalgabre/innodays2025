@@ -1,0 +1,69 @@
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.nav-item i,
+.nav-item lucide-icon {
+  font-size: 1.5rem;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-item:hover {
+  color: var(--gray-700);
+}
+
+.nav-item.active {
+  color: var(--primary-600);
+}
+
+.nav-item span {
+  font-size: 0.75rem;
+}
+
+/* Responsive - Desktop */
+@media (min-width: 768px) {
+  .home-container {
+    max-width: 480px;
+    margin: 0 auto;
+    border-left: 1px solid var(--gray-200);
+    border-right: 1px solid var(--gray-200);
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.app-main::-webkit-scrollbar {
+  display: none;
+}
+
+.app-main {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

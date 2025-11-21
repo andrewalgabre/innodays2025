@@ -20,15 +20,17 @@ export class GcsUploadService {
     const uploadUrl = `${this.baseUrl}/${this.bucketName}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${this.apiKey}`;
 
     try {
+      let headers = new HttpHeaders({
+        'Content-Type': file.type || 'application/octet-stream'
+      });
       await firstValueFrom(
         this.http.post(uploadUrl, file, {
-          headers: new HttpHeaders({
-            'Content-Type': file.type || 'application/octet-stream'
-          })
+          headers: headers
         })
       );
 
       // Public URL zurückgeben
+      console.log(`Upload https://storage.googleapis.com/${this.bucketName}/${fileName}`);
       return `https://storage.googleapis.com/${this.bucketName}/${fileName}`;
     } catch (error) {
       console.error('Upload zu GCS fehlgeschlagen:', error);
@@ -44,52 +46,39 @@ export class GcsUploadService {
     fileName: string,
     onProgress?: (progress: number) => void
   ): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const uploadUrl = `${this.baseUrl}/${this.bucketName}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${this.apiKey}`;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const uploadUrl = `${this.baseUrl}/${this.bucketName}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${this.apiKey}`;
 
-      const xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
 
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable && onProgress) {
-          const progress = (e.loaded / e.total) * 100;
-          onProgress(progress);
-        }
-      });
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable && onProgress) {
+            const progress = (e.loaded / e.total) * 100;
+            onProgress(progress);
+          }
+        });
 
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
-          const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${fileName}`;
-          resolve(publicUrl);
-        } else {
-          reject(new Error(`Upload failed: ${xhr.status}`));
-        }
-      });
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200) {
+            const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${fileName}`;
+            resolve(publicUrl);
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        });
 
-      xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
 
-      xhr.open('POST', uploadUrl);
-      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-      xhr.send(file);
+        xhr.open('POST', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+        xhr.send(file);
+        console.log(`UploadWithProgress ${uploadUrl}`);
+
+      } catch (error) {
+        reject(error);
+      }
     });
-  }
-
-  /**
-   * Speziell für Scan-Bilder
-   */
-  async uploadScanImage(
-    cowId: string,
-    scanId: string,
-    image: Blob,
-    onProgress?: (progress: number) => void
-  ): Promise<string> {
-    const timestamp = Date.now();
-    const fileName = `scans/${cowId}/${scanId}_${timestamp}.jpg`;
-
-    if (onProgress) {
-      return this.uploadWithProgress(image, fileName, onProgress);
-    }
-
-    return this.uploadFile(image, fileName);
   }
 
   /**
