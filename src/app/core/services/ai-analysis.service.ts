@@ -33,7 +33,7 @@ export class AiAnalysisService {
 
   // Anthropic configuration
   private readonly anthropicApiKey =
-    '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'; // TODO: Replace with your API key
+    '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'; // TODO: Replace with your API key
   private readonly anthropicModel = 'claude-sonnet-4-5-20250929';
   private readonly anthropicVersion = '2023-06-01';
 
