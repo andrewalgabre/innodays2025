@@ -149,8 +149,8 @@ export class AiAnalysisService {
    */
   private async analyzeWithCustomAgent(imageBlob: Blob): Promise<AnalysisResult> {
     try {
-      // Custom API endpoint (via proxy in dev to avoid CORS)
-      const url = '/api/custom-agent/predict';
+      // Custom API endpoint (proxy in dev, direct URL in production)
+      const url = environment.customAgentUrl;
 
       // Build FormData for file upload
       const formData = new FormData();
@@ -168,9 +168,11 @@ export class AiAnalysisService {
       let errorMessage = 'Custom Agent Fehler';
 
       if (error.status === 0) {
-        errorMessage = 'Custom Agent nicht erreichbar. Bitte später versuchen.';
+        errorMessage = 'Custom Agent nicht erreichbar. CORS-Problem: Der API-Server muss CORS-Header für diese Domain erlauben.';
       } else if (error.status === 400) {
         errorMessage = 'Ungültiges Bildformat für Custom Agent.';
+      } else if (error.status === 405) {
+        errorMessage = 'Custom Agent: Methode nicht erlaubt (405). CORS-Konfiguration fehlt am Server.';
       } else if (error.status === 413) {
         errorMessage = 'Bild zu groß für Custom Agent.';
       } else if (error.error?.message) {

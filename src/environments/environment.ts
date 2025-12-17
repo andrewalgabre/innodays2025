@@ -7,6 +7,7 @@ export const environment = {
     'ENC_=EVQlBjRaFGaZtkR0BzdJhnQwEVZxNHOVRnSoplZ0A3N2JTL110bLZmYB9kS24kU4IWQuEVQ',
   geminiProjectId: 'prj-bison-3097627891-rindern',
   geminiLocation: 'us-central1',
+  customAgentUrl: '/api/custom-agent/predict', // Use proxy in dev to avoid CORS
   gcs: {
     apiKey: 'AIzaSyBiwL6_fkFil_itnEKr82DaQptGfwdD750',
     bucketName: 'rinder-inno-25-input-xx359beradgsf',
