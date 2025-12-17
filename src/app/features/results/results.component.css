@@ -356,6 +356,40 @@
   color: var(--text-700);
 }
 
+/* Debug section for raw API responses */
+.debug-section {
+  background-color: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.debug-section .accordion-header {
+  background-color: #f3f4f6;
+  color: #374151;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
+.debug-section .accordion-header:hover {
+  background-color: #e5e7eb;
+}
+
+.raw-response {
+  background-color: #1f2937;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'Courier New', Consolas, Monaco, monospace;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  border: 1px solid #374151;
+}
+
 .recommendations-list {
   list-style: none;
   padding: 0;

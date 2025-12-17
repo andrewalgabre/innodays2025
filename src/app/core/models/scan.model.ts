@@ -26,6 +26,7 @@ export interface AnalysisResult {
   uncertainties?: string;
   flirMetadata?: FLIRMetadata;
   thermalData?: ThermalData;
+  rawResponse?: any; // Store raw API response for debugging (custom agent)
 }
 
 // Diagnosis is returned in German from AI, so we accept any string

@@ -10,5 +10,9 @@ export const environment = {
   gcs: {
     apiKey: 'AIzaSyBiwL6_fkFil_itnEKr82DaQptGfwdD750',
     bucketName: 'rinder-inno-25-input-xx359beradgsf',
-  }
+  },
+  // Training buckets for GCS upload
+  gcsBucketHealthy: 'agrivue-training-healthy',
+  gcsBucketUnhealthy: 'agrivue-training-unhealthy',
+  gcsUploadEndpoint: '', // Set to Cloud Function URL when available
 };

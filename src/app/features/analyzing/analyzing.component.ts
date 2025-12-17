@@ -28,6 +28,7 @@ export class AnalyzingComponent implements OnInit {
   showTemperatureZones = false;
   showProbabilityScores = false;
   showUncertainties = false;
+  showRawResponse = false;
 
   constructor(
     private aiAnalysisService: AiAnalysisService,
@@ -166,6 +167,9 @@ export class AnalyzingComponent implements OnInit {
         break;
       case 'recommendations':
         this.showRecommendations = !this.showRecommendations;
+        break;
+      case 'rawResponse':
+        this.showRawResponse = !this.showRawResponse;
         break;
       case 'flirMetadata':
         this.showFlirMetadata = !this.showFlirMetadata;

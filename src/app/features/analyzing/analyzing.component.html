@@ -228,6 +228,17 @@
         </div>
       </div>
 
+      <!-- Raw API Response (Debug - Custom Agent Only) -->
+      <div class="info-section accordion-section debug-section" *ngIf="analysisResult.rawResponse">
+        <h3 class="accordion-header" (click)="toggleSection('rawResponse')">
+          <span>🔧 API Response (Debug)</span>
+          <lucide-icon [name]="showRawResponse ? 'chevron-up' : 'chevron-down'"></lucide-icon>
+        </h3>
+        <div class="accordion-content" *ngIf="showRawResponse">
+          <pre class="raw-response">{{ analysisResult.rawResponse | json }}</pre>
+        </div>
+      </div>
+
       <div class="feedback-buttons">
         <button class="btn btn-feedback btn-thumbs-up" (click)="sendFeedback('up')">
           <lucide-icon name="thumbs-up"></lucide-icon>

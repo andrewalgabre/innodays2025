@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AnalysisResult } from '../models/scan.model';
+import { AffectedArea, AnalysisResult } from '../models/scan.model';
 import { ThermalData } from '../models/thermal.model';
 import { SecretUtil } from '../utils/secret.util';
 import { SettingsService } from './settings.service';
@@ -55,6 +55,8 @@ export class AiAnalysisService {
 
     if (provider === 'anthropic') {
       return await this.analyzeWithAnthropic(imageBlob);
+    } else if (provider === 'custom') {
+      return await this.analyzeWithCustomAgent(imageBlob);
     } else {
       return await this.analyzeWithGemini(imageBlob);
     }
@@ -136,6 +138,45 @@ export class AiAnalysisService {
         errorMessage = `Anthropic: ${error.error.error.message}`;
       } else if (error.message) {
         errorMessage = `Anthropic: ${error.message}`;
+      }
+
+      throw new Error(errorMessage);
+    }
+  }
+
+  /**
+   * Analyze with Custom Hoof Classification Agent (ML model)
+   */
+  private async analyzeWithCustomAgent(imageBlob: Blob): Promise<AnalysisResult> {
+    try {
+      // Custom API endpoint (via proxy in dev to avoid CORS)
+      const url = '/api/custom-agent/predict';
+
+      // Build FormData for file upload
+      const formData = new FormData();
+      formData.append('file', imageBlob, 'hoof-image.jpg');
+
+      // Send POST request with FormData
+      const response = await firstValueFrom(
+        this.http.post<any>(url, formData)
+      );
+
+      // Parse Custom Agent response
+      return this.parseCustomAgentResponse(response);
+    } catch (error: any) {
+      // Create user-friendly error message
+      let errorMessage = 'Custom Agent Fehler';
+
+      if (error.status === 0) {
+        errorMessage = 'Custom Agent nicht erreichbar. Bitte später versuchen.';
+      } else if (error.status === 400) {
+        errorMessage = 'Ungültiges Bildformat für Custom Agent.';
+      } else if (error.status === 413) {
+        errorMessage = 'Bild zu groß für Custom Agent.';
+      } else if (error.error?.message) {
+        errorMessage = `Custom Agent: ${error.error.message}`;
+      } else if (error.message) {
+        errorMessage = `Custom Agent: ${error.message}`;
       }
 
       throw new Error(errorMessage);
@@ -750,6 +791,136 @@ WICHTIG:
     if (lower.includes('severe')) return 'severe';
 
     return 'none';
+  }
+
+  /**
+   * Parse Custom Agent response into AnalysisResult
+   */
+  private parseCustomAgentResponse(response: any): AnalysisResult {
+    try {
+      // Extract first prediction from response
+      const prediction = response.predictions?.[0];
+      if (!prediction) {
+        throw new Error('No predictions found in Custom Agent response');
+      }
+
+      // Extract classification data
+      const label = prediction.classification?.label;
+      const probabilities = prediction.classification?.probabilities || {};
+      const detectionConfidence = prediction.detection_confidence || 0;
+      const bbox = prediction.bbox;
+      const isInfrared = prediction.is_infrared;
+
+      // Determine if disease is detected
+      const isPositive = label === 'positive';
+
+      // Use the appropriate confidence score
+      const confidence = isPositive
+        ? (probabilities.positive || 0)
+        : (probabilities.negative || 0);
+
+      // Map to German diagnosis
+      const diagnosis = isPositive ? 'Verdacht auf Erkrankung' : 'gesund';
+
+      // Determine severity based on confidence
+      let severity: 'none' | 'mild' | 'moderate' | 'severe' = 'none';
+      if (isPositive) {
+        if (confidence > 0.9) {
+          severity = 'moderate';
+        } else if (confidence > 0.7) {
+          severity = 'mild';
+        } else {
+          severity = 'mild';
+        }
+      }
+
+      // Build German summary
+      const confidencePercent = (confidence * 100).toFixed(0);
+      const summary = isPositive
+        ? `Das KI-Modell hat auffällige Bereiche mit ${confidencePercent}% Sicherheit erkannt. Eine weitere klinische Untersuchung durch einen Tierarzt oder Klauenpfleger wird empfohlen.`
+        : `Die Klaue zeigt keine Auffälligkeiten (${confidencePercent}% Sicherheit). Regelmäßige Kontrollen sollten fortgesetzt werden.`;
+
+      // Build affected areas from bounding box
+      const affectedAreas: AffectedArea[] = [];
+      if (isPositive && bbox) {
+        affectedAreas.push({
+          name: 'Erkannter Bereich',
+          location: {
+            x: bbox.x1,
+            y: bbox.y1,
+            width: bbox.x2 - bbox.x1,
+            height: bbox.y2 - bbox.y1,
+          },
+          severity: confidence > 0.9 ? 8 : 5,
+          temperature: 0, // Not provided by Custom Agent
+        });
+      }
+
+      // Build recommendations
+      const recommendations = isPositive
+        ? [
+            'Tierarzt oder Klauenpfleger konsultieren',
+            'Betroffene Klaue genau beobachten',
+            'Dokumentation für Verlaufskontrolle anlegen',
+          ]
+        : [
+            'Regelmäßige Klauenpflege fortsetzen',
+            'Auf Gangveränderungen oder Lahmheit achten',
+            'Nächste Kontrolle in 3 Monaten einplanen',
+          ];
+
+      // Build disease probability scores
+      const diseaseProbabilityScores = {
+        'Erkrankung erkannt': Math.round((probabilities.positive || 0) * 100),
+        'Gesund': Math.round((probabilities.negative || 0) * 100),
+      };
+
+      // Determine urgency level
+      let urgencyLevel = 0;
+      if (isPositive) {
+        if (confidence > 0.9) {
+          urgencyLevel = 2; // Mittleres Risiko
+        } else if (confidence > 0.7) {
+          urgencyLevel = 1; // Mild – beobachten
+        } else {
+          urgencyLevel = 1;
+        }
+      }
+
+      // Build FLIR metadata if infrared detected
+      const flirMetadata = isInfrared
+        ? {
+            cameraModel: 'FLIR (Custom Agent detected)',
+            minTemp: 0,
+            maxTemp: 0,
+            centerTemp: 0,
+            emissivity: 0,
+          }
+        : undefined;
+
+      return {
+        diagnosis: diagnosis,
+        confidence: confidence,
+        summary: summary,
+        affectedAreas: affectedAreas,
+        recommendations: recommendations,
+        severity: severity,
+        requiresVeterinaryAttention: isPositive && confidence > 0.7,
+        temperatureZones: isPositive
+          ? 'Auffälligkeiten im erkannten Bereich detektiert'
+          : 'Gleichmäßige Temperaturverteilung',
+        diseaseProbabilityScores: diseaseProbabilityScores,
+        lamenessProbability: isPositive ? Math.round(confidence * 100) : 0,
+        urgencyLevel: urgencyLevel,
+        uncertainties: detectionConfidence < 0.8
+          ? 'Erkennungssicherheit könnte durch bessere Bildqualität erhöht werden'
+          : undefined,
+        flirMetadata: flirMetadata,
+        rawResponse: response, // Store raw API response for debugging
+      };
+    } catch (error) {
+      throw new Error('Failed to parse Custom Agent response: ' + (error as Error).message);
+    }
   }
 
   /**

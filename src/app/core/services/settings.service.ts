@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-export type AIProvider = 'anthropic' | 'gemini';
+export type AIProvider = 'anthropic' | 'gemini' | 'custom';
 
 export interface AppSettings {
   aiProvider: AIProvider;

@@ -25,6 +25,7 @@ export class ResultsComponent implements OnInit {
   showTemperatureZones = false;
   showProbabilityScores = false;
   showUncertainties = false;
+  showRawResponse = false;
 
   // Expose Object for template
   Object = Object;
@@ -105,6 +106,9 @@ export class ResultsComponent implements OnInit {
         break;
       case 'uncertainties':
         this.showUncertainties = !this.showUncertainties;
+        break;
+      case 'rawResponse':
+        this.showRawResponse = !this.showRawResponse;
         break;
     }
   }

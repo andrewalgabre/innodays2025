@@ -57,6 +57,29 @@
             </ul>
           </div>
         </label>
+
+        <!-- Custom Agent Option -->
+        <label class="provider-option" [class.selected]="selectedProvider === 'custom'">
+          <input
+            type="radio"
+            name="provider"
+            value="custom"
+            [(ngModel)]="selectedProvider"
+            (change)="onProviderChange('custom')">
+          <div class="provider-content">
+            <div class="provider-header">
+              <div class="provider-name">Custom Hoof Classification</div>
+              <div class="provider-badge warning">ML Model</div>
+            </div>
+            <div class="provider-desc">Spezialisiert - ML-Modell für Huferkrankungen</div>
+            <ul class="provider-features">
+              <li>✓ Spezialisiertes Huferkennungsmodell</li>
+              <li>✓ Bounding-Box-Erkennung</li>
+              <li>✓ Schnelle Klassifikation</li>
+              <li>✗ Keine detaillierte Krankheitsidentifikation</li>
+            </ul>
+          </div>
+        </label>
       </div>
     </section>
 

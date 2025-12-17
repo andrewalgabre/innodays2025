@@ -1,0 +1,11 @@
+{
+  "/api/custom-agent": {
+    "target": "https://hoof-classification-service-279637354150.europe-west6.run.app",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api/custom-agent": ""
+    }
+  }
+}
