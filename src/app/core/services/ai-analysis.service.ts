@@ -844,7 +844,7 @@ WICHTIG:
       const affectedAreas: AffectedArea[] = [];
       if (isPositive && bbox) {
         affectedAreas.push({
-          name: 'Erkannter Bereich',
+          name: `Erkannter Bereich (${Math.round(bbox.x1)},${Math.round(bbox.y1)} - ${Math.round(bbox.x2)},${Math.round(bbox.y2)})`,
           location: {
             x: bbox.x1,
             y: bbox.y1,
@@ -852,7 +852,7 @@ WICHTIG:
             height: bbox.y2 - bbox.y1,
           },
           severity: confidence > 0.9 ? 8 : 5,
-          temperature: 0, // Not provided by Custom Agent
+          temperature: 0, // Not provided by Custom Agent - UI should hide temp display
         });
       }
 
@@ -887,16 +887,8 @@ WICHTIG:
         }
       }
 
-      // Build FLIR metadata if infrared detected
-      const flirMetadata = isInfrared
-        ? {
-            cameraModel: 'FLIR (Custom Agent detected)',
-            minTemp: 0,
-            maxTemp: 0,
-            centerTemp: 0,
-            emissivity: 0,
-          }
-        : undefined;
+      // Don't populate FLIR metadata for custom agent - it doesn't provide real thermal data
+      const flirMetadata = undefined;
 
       return {
         diagnosis: diagnosis,
@@ -906,11 +898,9 @@ WICHTIG:
         recommendations: recommendations,
         severity: severity,
         requiresVeterinaryAttention: isPositive && confidence > 0.7,
-        temperatureZones: isPositive
-          ? 'Auffälligkeiten im erkannten Bereich detektiert'
-          : 'Gleichmäßige Temperaturverteilung',
+        temperatureZones: undefined, // Custom Agent doesn't provide thermal zone analysis
         diseaseProbabilityScores: diseaseProbabilityScores,
-        lamenessProbability: isPositive ? Math.round(confidence * 100) : 0,
+        lamenessProbability: undefined, // Custom Agent doesn't provide lameness prediction
         urgencyLevel: urgencyLevel,
         uncertainties: detectionConfidence < 0.8
           ? 'Erkennungssicherheit könnte durch bessere Bildqualität erhöht werden'
